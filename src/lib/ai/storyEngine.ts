@@ -101,7 +101,7 @@ interface TopicTemplate {
 const TOPIC_BLUEPRINTS: TopicTemplate[] = [
   // 1. DIGESTION
   {
-    keywords: ['digest', 'food', 'stomach', 'eat', 'tummy', 'belly', 'chew'],
+    keywords: ['digest', 'digestion', 'stomach', 'esophagus', 'nutrient', 'digestive', 'how we digest', 'tummy enzyme', 'food journey', 'intestine'],
     theme: 'body',
     gradient: 'from-amber-100 via-orange-100 to-amber-50',
     defaultCompanion: 'animal',
@@ -697,6 +697,156 @@ const TOPIC_BLUEPRINTS: TopicTemplate[] = [
         'Only when covered in visible bright purple paint'
       ]
     })
+  },
+
+  // 9. NEEDS VS. WANTS / EVERYDAY FINANCIAL CHOICES
+  {
+    keywords: ['need', 'want', 'budget', 'spending', 'grocery', 'coin', 'money'],
+    theme: 'city',
+    gradient: 'from-amber-100 via-emerald-50 to-sky-50',
+    defaultCompanion: 'child',
+    levelVisuals: [
+      ['🍎', '🎮', '🛒', '💡'], // L1: Apple (need) vs Video game (want)
+      ['💧', '🧸', '🏠', '❓'], // L2: Water & Shelter vs Extra toys
+      ['🧺', '💰', '⚖️', '✨'], // L3: Balancing the shopping basket
+      ['💬', '📝', '🌟', '❤️'], // L4: Explaining the secret rule
+      ['🏆', '🛒', '🎉', '🌟']  // L5: Master Shopper Triumph!
+    ],
+    l1Prompt: 'Let’s sort what we need first! 🛒',
+    l1Speech: (child, comp) => ({
+      kiki: `“Welcome to the Town Market with ${comp}! Look at our shopping basket—which items do our bodies truly need to survive?”`,
+      companion: `“I see juicy red apples and shiny toy racecars! How do we tell a true need from a fun want?”`,
+      narration: [
+        `${child} and ${comp} arrive at the bustling Town Market with a shopping list.`,
+        `KIKI points to the checkout counter: today we uncover the secret difference between Needs and Wants!`
+      ]
+    }),
+    l2Prompt: 'Which of these is a NEED we must have to stay healthy and safe?',
+    l2Speech: (comp) => ({
+      kiki: `“Needs keep us alive, healthy, and warm! Wants are fun extras that make life playful. Which one comes first?”`,
+      companion: `“If we only have enough coins for one thing right now, what must we pick?”`,
+      narration: [
+        `KIKI holds up fresh bread and water on one side, and a toy robot on the other.`,
+        `Our health and safety come first every single time!`
+      ],
+      options: [
+        'Fresh water, healthy food, and warm clothes to stay alive and safe',
+        'A third video game console and shiny glitter stickers',
+        'Candy bars for breakfast, lunch, and dinner'
+      ]
+    }),
+    l3Prompt: 'How can we solve the market basket dilemma?',
+    l3Speech: (comp) => ({
+      kiki: `“${comp} wants a shiny bouncy ball, but the basket needs ingredients for dinner! How do we decide?”`,
+      companion: `“I really want the toy, but our family needs dinner tonight! What should our rule be?”`,
+      narration: [
+        `The market cashier smiles and waits for our decision.`,
+        `Smart explorers always take care of true needs before spending on wants!`
+      ],
+      options: [
+        'Fill the basket with dinner essentials first, and save remaining coins for treats later',
+        'Buy ten toys and go home with an empty dinner plate',
+        'Hide the groceries under the counter'
+      ]
+    }),
+    l4Prompt: 'In your own words, teach KIKI the difference between a Need and a Want!',
+    l4Speech: (comp) => ({
+      kiki: `“Tell me in your own words: How do you explain a Need versus a Want to a friend?”`,
+      companion: `“Explain our shopping rule so ${comp} never forgets at the grocery checkout!”`,
+      narration: [
+        `KIKI takes out a pocket market ledger to write down your wisdom.`,
+        `Share what you discovered about needs and wants in your own words!`
+      ]
+    }),
+    l5Prompt: 'When you receive allowance or gift coins, what is the smartest rule to remember?',
+    l5Speech: (comp) => ({
+      kiki: `“Hooray! You’re officially a Master Market Explorer!”`,
+      companion: `“Now I always know: Needs come first, and Wants are lovely bonuses!”`,
+      narration: [
+        `Confetti rains down over the Town Market stalls!`,
+        `${comp} and our explorer mastered the golden rule of Needs vs. Wants!`
+      ],
+      options: [
+        'Take care of essential needs first, then save or spend thoughtfully on wants',
+        'Spend all coins on the first toy you see in three seconds',
+        'Never eat food again so you can buy more plastic toys'
+      ]
+    })
+  },
+
+  // 10. HICCUPS / BODY MUSCLE REFLEX
+  {
+    keywords: ['hiccup', 'diaphragm', 'spasm'],
+    theme: 'body',
+    gradient: 'from-teal-100 via-sky-50 to-amber-50',
+    defaultCompanion: 'animal',
+    levelVisuals: [
+      ['😮', '🫁', '💨', '⚡'], // L1: Hiccup surprise
+      ['🥤', '🫧', '💨', '❓'], // L2: Diaphragm muscle jumping
+      ['🧘‍♂️', '💧', '🫁', '✨'], // L3: Calming the breathing rhythm
+      ['💬', '📝', '💡', '❤️'], // L4: Explaining the reflex
+      ['🏆', '🌟', '🫁', '🎉']  // L5: Hiccup mystery solved!
+    ],
+    l1Prompt: 'Let’s discover why hiccups happen! *HIC!* 😮',
+    l1Speech: (child, comp) => ({
+      kiki: `“*HIC!* Whoa! ${comp} just got the hiccups! Why does our body make that sudden jumpy squeak?”`,
+      companion: `“*Hic!* It feels like my breathing muscle is playing hopscotch! What’s happening inside?”`,
+      narration: [
+        `${child} and ${comp} hear a funny little *HIC!* sound echo across the room.`,
+        `KIKI points to the breathing muscle under our lungs: the diaphragm!`
+      ]
+    }),
+    l2Prompt: 'Which muscle is jumping when we get a hiccup?',
+    l2Speech: (comp) => ({
+      kiki: `“Right under our lungs sits a flat superhero muscle called the diaphragm. When it gets tickled or startled, it spasms!”`,
+      companion: `“Why does it make the 'HIC' sound when it twitches?”`,
+      narration: [
+        `KIKI demonstrates how the diaphragm pulls air in and snaps the vocal cords shut!`,
+        `The snap shut makes the famous *HIC!* sound!`
+      ],
+      options: [
+        'The diaphragm muscle underneath our lungs spasms and snaps our vocal cords shut',
+        'Tiny birds are chirping inside our elbows',
+        'Our teeth are clicking against our shoes'
+      ]
+    }),
+    l3Prompt: 'How can we help our diaphragm relax and stop hiccuping?',
+    l3Speech: (comp) => ({
+      kiki: `“To reset a startled diaphragm, we need to reset our breathing rhythm! Which method works?”`,
+      companion: `“Should I spin in circles or take slow, calm breaths?”`,
+      narration: [
+        `KIKI guides ${comp} in resetting the breathing rhythm.`,
+        `Calm, steady breathing or sipping water relaxes the muscle!`
+      ],
+      options: [
+        'Take slow deep breaths or sip cool water steadily to calm the muscle reflex',
+        'Yell loudly at a tree for three hours',
+        'Hold your breath until you turn into a purple grape'
+      ]
+    }),
+    l4Prompt: 'In your own words, teach KIKI why we get hiccups!',
+    l4Speech: (comp) => ({
+      kiki: `“Explain to KIKI: What causes a hiccup and how does our diaphragm do it?”`,
+      companion: `“Tell KIKI so we can share the secret with everyone who gets a funny *hic*!”`,
+      narration: [
+        `KIKI listens carefully to your explanation.`,
+        `Don’t worry about medical terms—just tell KIKI how the breathing muscle jumps!`
+      ]
+    }),
+    l5Prompt: 'Next time you or a friend gets hiccups, what will you tell them?',
+    l5Speech: (comp) => ({
+      kiki: `“Hooray! The diaphragm is calm and happy again!”`,
+      companion: `“No more hiccups! I know the science of my breathing superhero muscle!”`,
+      narration: [
+        `Bright sparkles swirl as ${comp} breathes easily and comfortably!`,
+        `Our brave explorer is a certified Body Science Explorer!`
+      ],
+      options: [
+        'It is just our diaphragm muscle having a quick spasm, and calm breathing helps it reset',
+        'It means aliens are sending secret radio signals through our nose',
+        'Hiccups last forever and never stop'
+      ]
+    })
   }
 ];
 
@@ -710,10 +860,34 @@ export function generateParametricStory(setup: ParentSetup): StoryLevel[] {
   const topicLower = setup.topic.toLowerCase();
   const goalLower = setup.learningGoal.toLowerCase();
 
-  // Find if a domain blueprint matches this topic
-  const matchingBlueprint = TOPIC_BLUEPRINTS.find(b => 
-    b.keywords.some(kw => topicLower.includes(kw) || goalLower.includes(kw))
+  // 1. Strict Priority Matching: Match against topic title first
+  let matchingBlueprint = TOPIC_BLUEPRINTS.find(b => 
+    b.keywords.some(kw => {
+      const regex = new RegExp(`\\b${kw}`, 'i');
+      return regex.test(topicLower);
+    })
   );
+
+  // 2. Secondary check against learning goal ONLY if topic doesn't conflict
+  if (!matchingBlueprint) {
+    matchingBlueprint = TOPIC_BLUEPRINTS.find(b => {
+      // Guard: Never match digestion or body blueprints if topic is about finance, civic, or plants
+      if (b.theme === 'body' && (
+        topicLower.includes('need') || 
+        topicLower.includes('want') || 
+        topicLower.includes('money') || 
+        topicLower.includes('budget') || 
+        topicLower.includes('plant') || 
+        topicLower.includes('sunlight')
+      )) {
+        return false;
+      }
+      return b.keywords.some(kw => {
+        const regex = new RegExp(`\\b${kw}`, 'i');
+        return regex.test(goalLower);
+      });
+    });
+  }
 
   if (matchingBlueprint) {
     const b = matchingBlueprint;
@@ -722,6 +896,7 @@ export function generateParametricStory(setup: ParentSetup): StoryLevel[] {
     const l3 = b.l3Speech(companion.name);
     const l4 = b.l4Speech(companion.name);
     const l5 = b.l5Speech(companion.name);
+
 
     return [
       {

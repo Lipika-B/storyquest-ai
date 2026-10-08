@@ -152,7 +152,7 @@ export interface AdventureSession {
   chapters?: StoryLevel[];      // compatibility alias
   starsEarned: number;
   interactions: ChildInteraction[];
-  status: 'welcome' | 'playing' | 'story' | 'scaffolding' | 'completed';
+  status: 'welcome' | 'intro' | 'playing' | 'story' | 'scaffolding' | 'completed';
   activeScaffolding?: AdaptiveScaffolding;
 }
 

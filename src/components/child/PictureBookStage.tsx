@@ -5,7 +5,8 @@ import { StoryLevel, AdaptiveScaffolding } from '@/lib/types/quest';
 import { KikiCharacter } from '../kiki/KikiCharacter';
 import { getCompanionDetails } from '@/lib/ai/storyEngine';
 import { TryAgainDifferentlyView } from './TryAgainDifferentlyView';
-import { Sparkles, ArrowRight, Check, MessageSquare, Send, HelpCircle, Volume2, VolumeX } from 'lucide-react';
+import { Sparkles, ArrowRight, Check, MessageSquare, Send, HelpCircle, Volume2, VolumeX, Hand } from 'lucide-react';
+import { playSuccessChime } from '@/lib/utils/audio';
 
 interface PictureBookStageProps {
   level: StoryLevel;
@@ -36,6 +37,29 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [ownWordsText, setOwnWordsText] = useState('');
   const [showHint, setShowHint] = useState(false);
+  const [tappedItemIdx, setTappedItemIdx] = useState<number | null>(null);
+  const [tappedMsg, setTappedMsg] = useState<string | null>(null);
+
+  const handleTapProp = (emoji: string, idx: number) => {
+    playSuccessChime();
+    setTappedItemIdx(idx);
+    let msg = `Look at this clue: ${level.keyDiscoveryHook}!`;
+    if (emoji === '🍌') msg = 'Yum! Bananas contain carbs that break down into energy!';
+    else if (emoji === '👄' || emoji === '🦷') msg = 'Teeth chew and mash food into tiny pieces!';
+    else if (emoji === '🫧') msg = 'Stomach juices break food down into tiny nutrients!';
+    else if (emoji === '🍎') msg = 'Apples are an essential healthy need before extra toys!';
+    else if (emoji === '🎮') msg = 'Video games are fun wants—enjoyed after needs are met!';
+    else if (emoji === '🚀' || emoji === '💎') msg = 'Fuel crystals arranged in 7 equal groups of 6!';
+    else if (emoji === '✈️') msg = 'Curved wings push air faster over the top to create lift!';
+    else if (emoji === '💨') msg = 'Fast air creates low pressure above the wing, lifting it!';
+    else if (emoji === '🔦') msg = 'Light beams travel straight until an object blocks them!';
+    else if (emoji === '🧱') msg = 'Opaque blocks stop light, casting a dark shadow!';
+    else if (emoji === '🧼') msg = 'Soap bubbles trap sticky germs and slide them away!';
+    else if (emoji === '💧') msg = 'Clean water washes the trapped germs right down the drain!';
+    else if (emoji === '🔒' || emoji === '🛡️') msg = 'Padlocks keep your personal passwords safe!';
+    else if (emoji === '😮' || emoji === '🫁') msg = 'The diaphragm muscle spasms and makes the *hic* sound!';
+    setTappedMsg(msg);
+  };
 
   // Background environment diorama styling based on level theme
   const getThemeStyles = () => {
@@ -177,17 +201,36 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
 
           {/* Center Visual Props / Vignette */}
           <div className="flex flex-col items-center justify-center max-w-[200px] sm:max-w-xs text-center mx-2">
+            {/* Tapped Discovery Popup */}
+            {tappedMsg && (
+              <div className="mb-2 p-2 rounded-xl bg-amber-400 text-amber-950 font-black text-xs shadow-lg animate-bounce-subtle border-2 border-white max-w-xs">
+                ✨ {tappedMsg}
+              </div>
+            )}
+
             <div className="flex items-center justify-center gap-2 mb-2 flex-wrap">
               {(level.sceneVisual.visualItems || []).map((item, idx) => (
-                <span
+                <button
                   key={idx}
-                  className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/15 backdrop-blur-md border border-white/30 text-2xl sm:text-3xl shadow-lg transform hover:scale-110 transition-transform animate-float"
+                  type="button"
+                  onClick={() => handleTapProp(item, idx)}
+                  className={`inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/40 text-2xl sm:text-3xl shadow-lg transform transition-all cursor-pointer active:scale-95 ${
+                    tappedItemIdx === idx
+                      ? 'scale-125 bg-amber-300 text-slate-950 ring-4 ring-amber-400 animate-bounce-subtle'
+                      : 'hover:scale-110 hover:bg-white/30 animate-float'
+                  }`}
                   style={{ animationDelay: `${idx * 0.3}s` }}
+                  title="Tap this clue!"
+                  aria-label={`Clue ${item}`}
                 >
                   {item}
-                </span>
+                </button>
               ))}
             </div>
+
+            <span className="text-[10px] text-amber-200/90 font-bold mb-1">
+              👆 Tap any clue to inspect!
+            </span>
 
             {/* Character Action description pill */}
             {level.sceneVisual.characterAction && (

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { ParentPortal } from '@/components/parent/ParentPortal';
 import { ChildQuestPortal } from '@/components/child/ChildQuestPortal';
+import { WorldLocation } from '@/components/child/KikisWorld';
 import { LearningReportView } from '@/components/report/LearningReportView';
 import { 
   ParentSetup, 
@@ -20,7 +21,8 @@ import { StorySpeaker } from '@/lib/utils/speech';
 import { generateParametricStory } from '@/lib/ai/storyEngine';
 
 export default function Home() {
-  const [currentPortal, setCurrentPortal] = useState<'parent' | 'child' | 'report'>('parent');
+  // Requirement: Default to Child Home (🌈 KIKI's World), with Parent Studio accessible via top navbar
+  const [currentPortal, setCurrentPortal] = useState<'parent' | 'child' | 'report'>('child');
   
   // Default Showcase Persona (Requirement 25: 7x6 equal groups, space, robot, rockets)
   const defaultTopicPreset = TOPIC_LIBRARY[0].topics[0];
@@ -49,7 +51,7 @@ export default function Home() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [soundEnabled, setSoundEnabledState] = useState(true);
 
-  // Hydrate session from session storage or initialize parametric session
+  // Hydrate session from session storage or initialize parametric session in KIKI's World
   useEffect(() => {
     const saved = loadActiveSession();
     if (saved) {
@@ -58,6 +60,7 @@ export default function Home() {
     } else {
       const initialLevels = generateParametricStory(setup);
       const initial = createInitialSession(setup, initialLevels);
+      initial.status = 'welcome'; // 🌈 KIKI's World is the entry experience
       setSession(initial);
     }
   }, []);
@@ -93,9 +96,102 @@ export default function Home() {
     // Prepare fresh adventure for this topic
     const freshLevels = generateParametricStory(updatedSetup);
     const newSession = createInitialSession(updatedSetup, freshLevels);
+    newSession.status = 'intro';
     setSession(newSession);
     setReport(null);
     setSuccessFeedback(null);
+  };
+
+  // Child selects a location in 🌈 KIKI's World
+  const handleSelectLocation = async (loc: WorldLocation) => {
+    const updatedSetup: ParentSetup = {
+      ...setup,
+      topic: loc.defaultTopic,
+      learningGoal: loc.defaultGoal,
+      childAge: loc.suggestedAge,
+      storyWorld: loc.storyWorld,
+      companionType: loc.companionType,
+    };
+    setSetup(updatedSetup);
+
+    // Instant high-quality parametric 5-level adventure
+    const levels = generateParametricStory(updatedSetup);
+    const newSession = createInitialSession(updatedSetup, levels);
+    newSession.status = 'intro'; // Transition into Cinematic Mini-Intro
+    setSession(newSession);
+    setReport(null);
+    setSuccessFeedback(null);
+
+    // Background AI enhancement if key is configured
+    try {
+      const res = await fetch('/api/story/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ setup: updatedSetup }),
+      });
+      const data = await res.json();
+      if (data.levels && data.levels.length === 5) {
+        setSession(prev => prev ? { ...prev, levels: data.levels } : null);
+      }
+    } catch (e) {
+      // Retain guaranteed parametric levels
+    }
+  };
+
+  // Child enters custom curiosity (e.g. "How do airplanes fly?")
+  const handleCustomTopicSubmit = async (topic: string, learningGoal?: string) => {
+    setIsLoading(true);
+    const updatedSetup: ParentSetup = {
+      ...setup,
+      topic,
+      learningGoal: learningGoal || `Discover the core principles of ${topic}`,
+      storyWorld: 'custom',
+    };
+    setSetup(updatedSetup);
+
+    // Synthesize tailored adventure
+    const freshLevels = generateParametricStory(updatedSetup);
+    const newSession = createInitialSession(updatedSetup, freshLevels);
+    newSession.status = 'intro';
+    setSession(newSession);
+    setReport(null);
+    setSuccessFeedback(null);
+
+    try {
+      const res = await fetch('/api/story/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ setup: updatedSetup }),
+      });
+      const data = await res.json();
+      if (data.levels && data.levels.length === 5) {
+        setSession(prev => prev ? { ...prev, levels: data.levels } : null);
+      }
+    } catch (e) {
+      // Retain parametric levels
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStartLevel1 = () => {
+    if (!session) return;
+    setSession({
+      ...session,
+      status: 'story',
+    });
+  };
+
+  const handleBackToWorld = () => {
+    StorySpeaker.stop();
+    setIsSpeaking(false);
+    setSuccessFeedback(null);
+    if (session) {
+      setSession({
+        ...session,
+        status: 'welcome',
+      });
+    }
   };
 
   const handleGenerateQuest = async () => {
@@ -112,15 +208,17 @@ export default function Home() {
       const generatedLevels = data.levels || data.chapters || [];
       if (generatedLevels.length > 0) {
         const newSession = createInitialSession(setup, generatedLevels);
+        newSession.status = 'intro';
         setSession(newSession);
         setReport(null);
-        setCurrentPortal('child'); // Opens Child Adventure in welcome mode
+        setCurrentPortal('child'); // Opens Child Adventure in intro mode
       }
     } catch (err) {
       console.error('Failed to generate story:', err);
       // Fallback to local parametric generation
       const freshLevels = generateParametricStory(setup);
       const newSession = createInitialSession(setup, freshLevels);
+      newSession.status = 'intro';
       setSession(newSession);
       setCurrentPortal('child');
     } finally {
@@ -135,6 +233,7 @@ export default function Home() {
       status: 'story',
     });
   };
+
 
   const handleSubmitAnswer = async (response: string) => {
     if (!session) return;
@@ -408,10 +507,12 @@ export default function Home() {
     setSetup(newSetup);
     setSelectedTopicId(defaultTopic.id);
     const freshLevels = generateParametricStory(newSetup);
-    setSession(createInitialSession(newSetup, freshLevels));
+    const initialSession = createInitialSession(newSetup, freshLevels);
+    initialSession.status = 'welcome';
+    setSession(initialSession);
     setReport(null);
     setSuccessFeedback(null);
-    setCurrentPortal('parent');
+    setCurrentPortal('child'); // Always return to KIKI's World
   };
 
 
@@ -448,14 +549,17 @@ export default function Home() {
         {currentPortal === 'child' && session && (
           <ChildQuestPortal
             session={session}
-            onStartAdventure={handleStartAdventure}
+            onSelectLocation={handleSelectLocation}
+            onCustomTopicSubmit={handleCustomTopicSubmit}
+            onStartLevel1={handleStartLevel1}
+            onBackToWorld={handleBackToWorld}
             onSubmitAnswer={handleSubmitAnswer}
             onRetrySubmit={handleRetrySubmit}
             onContinueToNextChapter={handleContinueToNextChapter}
             isLoading={isLoading}
             successFeedback={successFeedback}
             onViewReport={handleFetchReport}
-            onRestart={handleRestart}
+            onRestart={handleBackToWorld}
           />
         )}
 

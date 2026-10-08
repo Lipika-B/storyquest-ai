@@ -220,6 +220,59 @@ async function runTests() {
     assert(textG.includes('wing') || textG.includes('lift') || textG.includes('air') || textG.includes('fly'), 'Persona G teaches aviation wing lift');
 
     // -------------------------------------------------------------
+    // 7B. BUG FIX VERIFICATION: NEEDS VS. WANTS (Must NOT contain banana or digestion!)
+    // -------------------------------------------------------------
+    console.log('\n--- 7B. Testing Bug Fix: Needs vs. Wants (Must NOT feature bananas or digestion) ---');
+    const resNeeds = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Sammy',
+          childAge: 9,
+          topic: 'Needs vs. Wants',
+          learningGoal: 'Understand that needs (food, water, warm clothes) come first, while wants (extra toys, treats) come after.',
+          struggle: 'Demands expensive toy sets at the grocery checkout thinking money is unlimited.',
+          storyWorld: 'kitchen',
+          companionType: 'child',
+          interest: 'market stalls and piggy banks'
+        }
+      })
+    });
+    const dataNeeds = await resNeeds.json();
+    const levelsNeeds = dataNeeds.levels || dataNeeds.chapters || [];
+    assert(resNeeds.status === 200, 'Needs vs Wants returns status 200');
+    assert(levelsNeeds.length === 5, 'Needs vs Wants generates 5 adventure levels');
+    const textNeeds = JSON.stringify(levelsNeeds).toLowerCase();
+    assert(textNeeds.includes('need') || textNeeds.includes('want') || textNeeds.includes('market') || textNeeds.includes('shopping'), 'Story teaches Needs vs Wants');
+    assert(!textNeeds.includes('swallow a whole banana') && !textNeeds.includes('where does the banana go'), 'CRITICAL FIX VERIFIED: Needs vs Wants contains NO banana or swallowing dialogue!');
+
+    // -------------------------------------------------------------
+    // 7C. CUSTOM TOPIC: HICCUPS (Diaphragm muscle reflex)
+    // -------------------------------------------------------------
+    console.log('\n--- 7C. Testing Custom Topic: Hiccups (Diaphragm muscle reflex) ---');
+    const resHic = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Toby',
+          childAge: 7,
+          topic: 'Why Do We Get Hiccups?',
+          learningGoal: 'The diaphragm muscle underneath lungs spasms and snaps vocal cords shut',
+          storyWorld: 'custom',
+          companionType: 'animal'
+        }
+      })
+    });
+    const dataHic = await resHic.json();
+    const levelsHic = dataHic.levels || dataHic.chapters || [];
+    assert(resHic.status === 200, 'Hiccups returns status 200');
+    assert(levelsHic.length === 5, 'Hiccups generates 5 adventure levels');
+    const textHic = JSON.stringify(levelsHic).toLowerCase();
+    assert(textHic.includes('hiccup') || textHic.includes('diaphragm') || textHic.includes('breath'), 'Story teaches diaphragm reflex');
+
+    // -------------------------------------------------------------
     // 8. UNDERSTANDING CHECK: "Explain it in your own words" (Semantic evaluation)
     // -------------------------------------------------------------
     console.log('\n--- 8. Testing /api/story/evaluate ("Explain it in your own words") ---');

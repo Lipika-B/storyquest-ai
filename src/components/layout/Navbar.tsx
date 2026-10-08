@@ -32,7 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand: KIKI */}
         <div 
-          onClick={() => onSelectPortal('parent')} 
+          onClick={() => onSelectPortal('child')} 
           className="flex items-center gap-2.5 cursor-pointer group select-none"
         >
           <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-sky-400 via-amber-300 to-amber-400 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
@@ -44,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 KIKI
               </span>
               <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
-                Story Teacher
+                Story World
               </span>
             </div>
             <p className="text-[11px] text-slate-500 hidden sm:block font-medium">
@@ -53,29 +53,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Portal Switcher (Two distinct sides) */}
-        <nav aria-label="Portal Navigation" className="flex items-center bg-slate-100/80 p-1 rounded-2xl border border-slate-200">
-          <button
-            onClick={() => onSelectPortal('parent')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              currentPortal === 'parent'
-                ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <GraduationCap className="w-4 h-4 text-sky-600" />
-            <span>Parent & Teacher</span>
-          </button>
-
+        {/* Portal Switcher (Child World primary, Parent Studio accessible) */}
+        <nav aria-label="Portal Navigation" className="flex items-center bg-slate-100/90 p-1 rounded-2xl border border-slate-200">
           <button
             onClick={() => onSelectPortal('child')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
               currentPortal === 'child'
-                ? 'bg-amber-400 text-amber-950 shadow-xs'
+                ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-amber-950 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>Child Adventure</span>
+            <span>🌈 KIKI’s World</span>
             {starsEarned > 0 && (
               <span className="bg-amber-100 text-amber-950 text-xs px-1.5 py-0.2 rounded-full font-black ml-0.5">
                 ⭐ {starsEarned}
@@ -83,10 +71,23 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
+          <button
+            onClick={() => onSelectPortal('parent')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              currentPortal === 'parent'
+                ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <GraduationCap className="w-4 h-4 text-sky-600" />
+            <span className="hidden sm:inline">Parent & Teacher</span>
+            <span className="sm:hidden">Studio</span>
+          </button>
+
           {hasReportData && (
             <button
               onClick={() => onSelectPortal('report')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 currentPortal === 'report'
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-emerald-700 hover:text-emerald-900'
