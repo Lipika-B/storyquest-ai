@@ -79,6 +79,23 @@ export interface SceneVisualDetails {
   characterAction: string; // Brief description of what characters are doing in the picture
 }
 
+export type MiniGameType = 
+  | 'chew_food' 
+  | 'cut_pizza' 
+  | 'shadow_light' 
+  | 'match_habitat' 
+  | 'mix_colors' 
+  | 'push_cart' 
+  | 'world_map';
+
+export interface MiniGameConfig {
+  type: MiniGameType;
+  title: string;
+  instructions: string;
+  targetConcept: string;
+  data?: Record<string, any>;
+}
+
 export interface StoryLevel {
   levelNumber: number; // 1 to 5
   phase: LevelPhase;   // 'discover' | 'explore' | 'solve' | 'teach' | 'master'
@@ -93,6 +110,7 @@ export interface StoryLevel {
   shortNarration: string[]; // 1 to 3 short lines
   keyDiscoveryHook: string;
   interactionType: InteractionType;
+  miniGame?: MiniGameConfig;
   questionType?: QuestionType;
   prompt: string;
   options?: string[]; // for choice, prediction, master

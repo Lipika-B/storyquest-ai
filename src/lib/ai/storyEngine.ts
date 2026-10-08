@@ -1,4 +1,4 @@
-import { ParentSetup, StoryLevel, SceneVisualDetails, LearningPlan, QuestionType } from '../types/quest';
+import { ParentSetup, StoryLevel, SceneVisualDetails, LearningPlan, QuestionType, MiniGameConfig } from '../types/quest';
 import { formatLevelChoices } from '../utils/quiz';
 
 interface CompanionDetails {
@@ -554,6 +554,7 @@ interface TopicTemplate {
   theme: SceneVisualDetails['theme'];
   gradient: string;
   defaultCompanion: string;
+  miniGameType?: MiniGameConfig['type'];
   levelVisuals: string[][];
   l1Prompt: string;
   l1Speech: (child: string, companion: string, age: number) => { kiki: string; companion: string; narration: string[] };
@@ -575,6 +576,7 @@ const TOPIC_BLUEPRINTS: TopicTemplate[] = [
     theme: 'body',
     gradient: 'from-amber-100 via-orange-100 to-amber-50',
     defaultCompanion: 'animal',
+    miniGameType: 'chew_food',
     levelVisuals: [
       ['🐒', '🍌', '🌳', '✨'],
       ['👄', '🦷', '🍌', '⬇️'],
@@ -790,6 +792,7 @@ const TOPIC_BLUEPRINTS: TopicTemplate[] = [
     theme: 'kitchen',
     gradient: 'from-amber-100 via-orange-50 to-amber-50',
     defaultCompanion: 'child',
+    miniGameType: 'cut_pizza',
     levelVisuals: [
       ['🍕', '👧', '🔪', '✨'],
       ['🍕', '2️⃣', '🤝', '✂️'],
@@ -980,6 +983,7 @@ const TOPIC_BLUEPRINTS: TopicTemplate[] = [
     theme: 'forest',
     gradient: 'from-amber-100 via-sky-100 to-slate-100',
     defaultCompanion: 'animal',
+    miniGameType: 'shadow_light',
     levelVisuals: [
       ['🔦', '🦊', '👤', '🌲'],
       ['☀️', '🧍', '⬛', '📐'],
@@ -1138,6 +1142,7 @@ const TOPIC_BLUEPRINTS: TopicTemplate[] = [
     theme: 'space',
     gradient: 'from-slate-900 via-sky-950 to-slate-950',
     defaultCompanion: 'robot',
+    miniGameType: 'push_cart',
     levelVisuals: [
       ['🛒', '🤖', '➡️', '💨'],
       ['🛹', '⚡', '🛑', '📐'],
@@ -1592,6 +1597,7 @@ const TOPIC_BLUEPRINTS: TopicTemplate[] = [
     theme: 'city',
     gradient: 'from-blue-900 via-indigo-900 to-slate-900',
     defaultCompanion: 'child',
+    miniGameType: 'world_map',
     levelVisuals: [
       ['🌍', '✈️', '🧭', '🗺️'],
       ['🏛️', '🚩', '📜', '✨'],
@@ -1671,6 +1677,7 @@ const TOPIC_BLUEPRINTS: TopicTemplate[] = [
     theme: 'forest',
     gradient: 'from-rose-100 via-amber-100 to-sky-100',
     defaultCompanion: 'animal',
+    miniGameType: 'mix_colors',
     levelVisuals: [
       ['🎨', '🌈', '🖌️', '✨'],
       ['🔴', '🟡', '🔵', '💧'],
@@ -1746,6 +1753,7 @@ const TOPIC_BLUEPRINTS: TopicTemplate[] = [
     theme: 'forest',
     gradient: 'from-amber-100 via-sky-100 to-emerald-100',
     defaultCompanion: 'animal',
+    miniGameType: 'match_habitat',
     levelVisuals: [
       ['🐾', '🐫', '🐻‍❄️', '🌲'],
       ['🏜️', '❄️', '🏝️', '🔍'],
@@ -1990,6 +1998,12 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
         shortNarration: l2.narration,
         keyDiscoveryHook: `Key Clue: ${setup.learningGoal}`,
         interactionType: 'choice',
+        miniGame: b.miniGameType ? {
+          type: b.miniGameType,
+          title: `Hands-On Adventure: ${setup.topic}`,
+          instructions: `Explore the interactive mini-game!`,
+          targetConcept: setup.learningGoal,
+        } : undefined,
         questionType: 'prediction',
         prompt: b.l2Prompt(age),
         options: l2Choices.options,
@@ -2164,6 +2178,16 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
       ],
       keyDiscoveryHook: `Core Principle: ${setup.learningGoal}`,
       interactionType: 'choice',
+      miniGame: (() => {
+        if (topicLower.includes('digest')) return { type: 'chew_food', title: 'Chew and Break Food Down', instructions: 'Tap teeth to chew food into soft bites', targetConcept: setup.learningGoal };
+        if (topicLower.includes('fraction') || topicLower.includes('half') || topicLower.includes('quarter')) return { type: 'cut_pizza', title: 'Slice the Pizza and Compare Fractions', instructions: 'Cut slices and notice slice size', targetConcept: setup.learningGoal };
+        if (topicLower.includes('shadow') || topicLower.includes('light')) return { type: 'shadow_light', title: 'Slide the Flashlight', instructions: 'Slide angle to watch shadow move', targetConcept: setup.learningGoal };
+        if (topicLower.includes('force') || topicLower.includes('friction') || topicLower.includes('motion')) return { type: 'push_cart', title: 'Push Cart on Ice vs Track', instructions: 'Test friction resistance', targetConcept: setup.learningGoal };
+        if (topicLower.includes('color') || topicLower.includes('colour') || topicLower.includes('rainbow')) return { type: 'mix_colors', title: 'Mix Primary Paints', instructions: 'Mix paint drops into new colours', targetConcept: setup.learningGoal };
+        if (topicLower.includes('habitat') || topicLower.includes('animal')) return { type: 'match_habitat', title: 'Match Animals to Habitats', instructions: 'Match creatures to their homes', targetConcept: setup.learningGoal };
+        if (topicLower.includes('passport') || topicLower.includes('capital') || topicLower.includes('country')) return { type: 'world_map', title: 'World Capitals', instructions: 'Identify capitals and collect stamps', targetConcept: setup.learningGoal };
+        return undefined;
+      })(),
       questionType: 'prediction',
       prompt: `Which idea explains how ${setup.topic} works?`,
       options: fallbackL2.options,

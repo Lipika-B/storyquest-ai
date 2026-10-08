@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { AdventureSession, ParentSetup } from '@/lib/types/quest';
 import { KikisWorld, WorldLocation } from './KikisWorld';
+import { WorldPassportView } from './WorldPassportView';
 import { AdventureIntro } from './AdventureIntro';
 import { PictureBookStage } from './PictureBookStage';
 import { AdventureMapNav } from './AdventureMapNav';
@@ -39,6 +40,7 @@ export const ChildQuestPortal: React.FC<ChildQuestPortalProps> = ({
   onRestart,
 }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showPassport, setShowPassport] = useState(false);
 
   // Safety fallback for levels array
   const levels = session.levels || session.chapters || [];
@@ -57,12 +59,33 @@ export const ChildQuestPortal: React.FC<ChildQuestPortalProps> = ({
     }
   };
 
+  // Dedicated World Passport Experience
+  if (showPassport) {
+    return (
+      <WorldPassportView
+        childName={session.setup.childName}
+        onBack={() => setShowPassport(false)}
+        onStartQuest={(topic, goal) => {
+          setShowPassport(false);
+          onCustomTopicSubmit(topic, goal);
+        }}
+      />
+    );
+  }
+
   // 1. CHILD HOME SCREEN: 🌈 KIKI'S WORLD (The illustrated cartoon adventure map)
   if (session.status === 'welcome') {
     return (
       <KikisWorld
-        onSelectLocation={onSelectLocation}
+        onSelectLocation={(loc) => {
+          if (loc.id === 'world-passport') {
+            setShowPassport(true);
+          } else {
+            onSelectLocation(loc);
+          }
+        }}
         onCustomTopicSubmit={onCustomTopicSubmit}
+        onOpenPassport={() => setShowPassport(true)}
         isLoading={isLoading}
       />
     );

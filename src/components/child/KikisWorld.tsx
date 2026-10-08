@@ -234,12 +234,14 @@ const QUICK_IDEA_CHIPS = [
 interface KikisWorldProps {
   onSelectLocation: (location: WorldLocation) => void;
   onCustomTopicSubmit: (topic: string, learningGoal?: string) => void;
+  onOpenPassport?: () => void;
   isLoading: boolean;
 }
 
 export const KikisWorld: React.FC<KikisWorldProps> = ({
   onSelectLocation,
   onCustomTopicSubmit,
+  onOpenPassport,
   isLoading,
 }) => {
   const [activeKikiDialogue, setActiveKikiDialogue] = useState<string>(
@@ -339,27 +341,45 @@ export const KikisWorld: React.FC<KikisWorldProps> = ({
             </h1>
 
             <p className="mt-1.5 text-xs sm:text-sm font-bold text-slate-600">
-              Tap any magical place below to begin, or type what you want to learn!
+              Tap any magical place along the adventure trail to begin, or type what you want to learn!
             </p>
+
+            {onOpenPassport && (
+              <div className="mt-3.5 pt-3 border-t border-amber-200/80 flex items-center gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={onOpenPassport}
+                  className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-400 hover:from-amber-300 text-amber-950 font-black text-xs shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                >
+                  <span>🌍 Open KIKI’s World Passport</span>
+                  <span className="text-[10px] bg-white/40 px-1.5 py-0.5 rounded-full">Collect Country Stamps!</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* 3. The Interactive Cartoon Map: Clickable Locations Grid */}
+        {/* 3. The Interactive Adventure Trail: Clickable Locations Grid */}
         <div className="mb-12">
-          <div className="flex items-center justify-between mb-4 px-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 px-2">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🗺️</span>
+              <span className="text-2xl animate-bounce-subtle">🗺️</span>
               <h2 className="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-wide drop-shadow-xs">
-                Pick a Story World to Explore
+                KIKI’s Adventure Trail Map
               </h2>
             </div>
-            <span className="text-xs font-bold text-slate-700 bg-white/80 backdrop-blur-xs px-3 py-1 rounded-full border border-slate-200 shadow-xs hidden sm:inline">
-              9 Adventure Lands Ready!
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-amber-950 bg-amber-200/80 px-3 py-1 rounded-full border border-amber-300 shadow-xs">
+                ✨ Follow the winding trail!
+              </span>
+              <span className="text-xs font-bold text-slate-700 bg-white/80 backdrop-blur-xs px-3 py-1 rounded-full border border-slate-200 shadow-xs hidden sm:inline">
+                {WORLD_LOCATIONS.length} Adventure Stations Ready!
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {WORLD_LOCATIONS.map((loc) => {
+            {WORLD_LOCATIONS.map((loc, locIdx) => {
               const isHovered = hoveredLocationId === loc.id;
 
               return (

@@ -256,19 +256,21 @@ export default function Home() {
     const currentLevel = levels[currentIndex];
     if (!currentLevel) return;
 
-    // Special Case: Level 1 "discover_tap" ("Let's find out! 🚀")
-    if (currentLevel.interactionType === 'discover_tap' || response === 'tap_discover') {
+    // Special Case: Level 1 "discover_tap" ("Let's find out! 🚀") or Mini-Game Completion
+    if (currentLevel.interactionType === 'discover_tap' || response === 'tap_discover' || response === 'minigame_complete') {
       playSuccessChime();
       playStarEarnedSound();
 
       const interaction: ChildInteraction = {
         levelNumber: currentLevel.levelNumber || currentIndex + 1,
         phase: currentLevel.phase,
-        question: currentLevel.prompt || 'Discover Phase Initiation',
-        childResponse: 'Let’s find out! 🚀',
+        question: currentLevel.prompt || 'Interactive Hands-On Exploration',
+        childResponse: response === 'minigame_complete' ? 'Completed hands-on story mini-game! 🎮' : 'Let’s find out! 🚀',
         attemptNumber: 1,
         demonstratedConcept: true,
-        positiveEvidence: ['Eagerly leaped into the discovery phase'],
+        positiveEvidence: response === 'minigame_complete'
+          ? ['Engaged hands-on and demonstrated the target mechanism']
+          : ['Eagerly leaped into the discovery phase'],
         misconceptionIdentified: null,
         scaffoldingUsed: false,
       };

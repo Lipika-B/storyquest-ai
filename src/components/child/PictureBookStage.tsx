@@ -5,8 +5,9 @@ import { StoryLevel, AdaptiveScaffolding } from '@/lib/types/quest';
 import { KikiCharacter } from '../kiki/KikiCharacter';
 import { getCompanionDetails } from '@/lib/ai/storyEngine';
 import { TryAgainDifferentlyView } from './TryAgainDifferentlyView';
-import { Sparkles, ArrowRight, Check, MessageSquare, Send, HelpCircle, Volume2, VolumeX, Hand } from 'lucide-react';
-import { playSuccessChime } from '@/lib/utils/audio';
+import { StoryMiniGame } from './games/StoryMiniGame';
+import { Sparkles, ArrowRight, Check, MessageSquare, Send, HelpCircle, Volume2, VolumeX, BookOpen, Star } from 'lucide-react';
+import { playSuccessChime, playStarEarnedSound } from '@/lib/utils/audio';
 
 interface PictureBookStageProps {
   level: StoryLevel;
@@ -39,6 +40,7 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
   const [showHint, setShowHint] = useState(false);
   const [tappedItemIdx, setTappedItemIdx] = useState<number | null>(null);
   const [tappedMsg, setTappedMsg] = useState<string | null>(null);
+  const [miniGameDone, setMiniGameDone] = useState(false);
 
   const handleTapProp = (emoji: string, idx: number) => {
     playSuccessChime();
@@ -65,6 +67,18 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
     setTappedMsg(msg);
   };
 
+  const handleMiniGameComplete = () => {
+    setMiniGameDone(true);
+    playSuccessChime();
+    playStarEarnedSound();
+    // Automatically submit answer if choice exists or notify discovery
+    if (level.correctOption) {
+      onSubmitAnswer(level.correctOption);
+    } else {
+      onSubmitAnswer('minigame_complete');
+    }
+  };
+
   // Background environment diorama styling based on level theme
   const getThemeStyles = () => {
     switch (level.sceneVisual.theme) {
@@ -72,7 +86,6 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
         return {
           wrapper: 'bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 text-white',
           ground: 'bg-indigo-900/60 border-t-2 border-indigo-400/30',
-          accent: 'border-indigo-400/30',
           dioramaProp: (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className="absolute top-4 left-10 text-amber-300 text-xs animate-pulse">✨</div>
@@ -86,7 +99,6 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
         return {
           wrapper: 'bg-gradient-to-b from-rose-950 via-pink-900 to-amber-950 text-white',
           ground: 'bg-rose-900/50 border-t-2 border-rose-400/30',
-          accent: 'border-rose-400/30',
           dioramaProp: (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className="absolute top-4 left-1/4 w-32 h-32 rounded-full bg-rose-500/20 blur-xl" />
@@ -99,7 +111,6 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
         return {
           wrapper: 'bg-gradient-to-b from-emerald-950 via-teal-950 to-slate-900 text-white',
           ground: 'bg-emerald-900/50 border-t-2 border-emerald-400/30',
-          accent: 'border-emerald-400/30',
           dioramaProp: (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className="absolute top-4 left-8 text-xl opacity-80">☀️</div>
@@ -112,7 +123,6 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
         return {
           wrapper: 'bg-gradient-to-b from-sky-950 via-blue-900 to-indigo-950 text-white',
           ground: 'bg-sky-900/50 border-t-2 border-sky-400/30',
-          accent: 'border-sky-400/30',
           dioramaProp: (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className="absolute top-6 left-12 text-2xl opacity-60">☁️</div>
@@ -125,7 +135,6 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
         return {
           wrapper: 'bg-gradient-to-b from-slate-950 via-cyan-950 to-slate-900 text-white',
           ground: 'bg-cyan-900/40 border-t-2 border-cyan-400/40',
-          accent: 'border-cyan-400/30',
           dioramaProp: (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className="absolute top-6 left-12 text-cyan-300 text-base opacity-70">🛡️</div>
@@ -141,7 +150,6 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
         return {
           wrapper: 'bg-gradient-to-b from-slate-900 via-amber-950/60 to-slate-900 text-white',
           ground: 'bg-amber-900/40 border-t-2 border-amber-400/30',
-          accent: 'border-amber-400/30',
           dioramaProp: (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               <div className="absolute top-6 left-12 text-amber-200 text-base opacity-70">✨</div>
@@ -160,34 +168,73 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
     onSubmitAnswer(ownWordsText.trim());
   };
 
+  // Check if this level should display an embedded mini-game
+  const shouldRenderMiniGame = Boolean(
+    level.miniGame ||
+    (level.levelNumber === 2 && (
+      level.expectedCoreConcept.toLowerCase().includes('digest') ||
+      level.expectedCoreConcept.toLowerCase().includes('fraction') ||
+      level.expectedCoreConcept.toLowerCase().includes('shadow') ||
+      level.expectedCoreConcept.toLowerCase().includes('habitat') ||
+      level.expectedCoreConcept.toLowerCase().includes('color') ||
+      level.expectedCoreConcept.toLowerCase().includes('force') ||
+      level.title.toLowerCase().includes('digest') ||
+      level.title.toLowerCase().includes('fraction') ||
+      level.title.toLowerCase().includes('shadow') ||
+      level.title.toLowerCase().includes('habitat') ||
+      level.title.toLowerCase().includes('color') ||
+      level.title.toLowerCase().includes('motion')
+    ))
+  );
+
   return (
-    <article aria-label={`Story Level ${level.levelNumber}`} className="bg-white rounded-3xl border-2 border-amber-200/90 shadow-xl overflow-hidden mb-6 animate-fadeIn">
+    <article
+      aria-label={`Story Level ${level.levelNumber}`}
+      className="relative bg-[#fefcf7] rounded-3xl border-4 border-amber-300 shadow-2xl overflow-hidden mb-6 animate-fadeIn"
+    >
+      {/* Picture-Book Binding Header Spine Ribbon */}
+      <div className="bg-amber-100 border-b-2 border-amber-300/80 px-6 py-2.5 flex items-center justify-between text-xs font-black text-amber-950">
+        <div className="flex items-center gap-2">
+          <BookOpen className="w-4 h-4 text-amber-700" />
+          <span className="uppercase tracking-widest text-[11px]">
+            📖 Storybook Page {level.levelNumber} of 5
+          </span>
+          <span className="text-amber-500">•</span>
+          <span className="text-amber-800 font-bold">{level.phaseLabel}</span>
+        </div>
+
+        <button
+          type="button"
+          onClick={onToggleSpeech}
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black transition-all cursor-pointer ${
+            isSpeaking
+              ? 'bg-rose-500 text-white animate-pulse shadow-md shadow-rose-500/30'
+              : 'bg-white hover:bg-amber-200 text-amber-950 border border-amber-300'
+          }`}
+          title="Read story aloud"
+          aria-label="Read story aloud"
+        >
+          {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-amber-700" />}
+          <span>{isSpeaking ? 'Pause' : 'Read Aloud 🎧'}</span>
+        </button>
+      </div>
+
       {/* 1. BIG PICTURE / SCENE (Primary Illustrated Visual Focus) */}
       <div className={`relative px-6 pt-6 pb-12 overflow-hidden transition-all duration-500 ${theme.wrapper}`}>
         {theme.dioramaProp}
 
-        {/* Level & Phase Pill Header */}
-        <div className="relative z-10 flex items-center justify-between gap-3 mb-6">
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white shadow-xs">
-              {level.phaseLabel} • {level.title}
-            </span>
-          </div>
+        {/* Level Title Pill */}
+        <div className="relative z-10 flex items-center justify-between gap-3 mb-4">
+          <span className="px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white shadow-xs">
+            {level.title}
+          </span>
 
-          <button
-            type="button"
-            onClick={onToggleSpeech}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black backdrop-blur-md transition-all cursor-pointer ${
-              isSpeaking
-                ? 'bg-rose-500 text-white animate-pulse shadow-md shadow-rose-500/30'
-                : 'bg-white/20 hover:bg-white/30 text-white border border-white/25'
-            }`}
-            title="Read story aloud"
-            aria-label="Read story aloud"
-          >
-            {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-amber-300" />}
-            <span className="hidden sm:inline">{isSpeaking ? 'Pause' : 'Read to Me'}</span>
-          </button>
+          {level.keyDiscoveryHook && (
+            <span className="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-400/90 text-amber-950">
+              <Sparkles className="w-3 h-3 text-amber-950" />
+              <span>{level.keyDiscoveryHook}</span>
+            </span>
+          )}
         </div>
 
         {/* The Illustrated Visual Stage: KIKI + Center Visual Props + Companion */}
@@ -213,7 +260,7 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
             )}
 
             <div className="flex items-center justify-center gap-2 mb-2 flex-wrap">
-              {(level.sceneVisual.visualItems || []).map((item, idx) => (
+              {(level.sceneVisual.visualItems || []).map((item: string, idx: number) => (
                 <button
                   key={idx}
                   type="button"
@@ -255,7 +302,7 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
           </div>
         </div>
 
-        {/* In-Scene Dialogue Speech Bubble */}
+        {/* In-Scene Dialogue Speech Bubbles */}
         {(level.kikiDialogue || level.characterDialogue) && (
           <div className="relative z-10 max-w-lg mx-auto mt-4 px-4 py-3 rounded-2xl bg-white/95 text-slate-900 border-2 border-amber-300 shadow-lg text-xs sm:text-sm font-bold text-center">
             {level.kikiDialogue && (
@@ -281,16 +328,8 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
         <div className={`absolute bottom-0 left-0 right-0 h-6 ${theme.ground}`} />
       </div>
 
-      {/* 2. SHORT STORY / DIALOGUE CARD */}
-      <div className="p-6 sm:p-8 bg-white border-b border-amber-100">
-        {/* Discovery Hook Pill */}
-        {level.keyDiscoveryHook && (
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-950 border border-amber-300 text-xs font-black uppercase tracking-wider mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>{level.keyDiscoveryHook}</span>
-          </div>
-        )}
-
+      {/* 2. PICTURE-BOOK STORY NARRATION */}
+      <div className="p-6 sm:p-8 bg-[#fffefc] border-b border-amber-200/70">
         <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-3">
           {level.title}
         </h2>
@@ -304,7 +343,7 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
           ))}
         </div>
 
-        {/* Companion Speaker In-Story Dialogue (if both existed) */}
+        {/* Companion In-Story Dialogue */}
         {level.characterDialogue && level.kikiDialogue && (
           <div className="mt-5 p-3.5 rounded-2xl bg-sky-50 border border-sky-200 flex items-center gap-3">
             <span className="text-2xl flex-shrink-0">{companion.avatarEmoji}</span>
@@ -320,7 +359,7 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
         )}
       </div>
 
-      {/* 3. ONE SIMPLE INTERACTION SECTION */}
+      {/* 3. ONE MEANINGFUL INTERACTION (OR EMBEDDED MINI-GAME) */}
       <div className="p-6 sm:p-8 bg-amber-50/40">
         {/* SUCCESS BANNER & UNLOCK NEXT LEVEL */}
         {successFeedback ? (
@@ -344,7 +383,7 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
               onClick={onContinue}
               className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-amber-950 font-black text-base flex items-center justify-center gap-2.5 shadow-lg shadow-amber-400/25 transition-all hover:scale-105 active:scale-95 cursor-pointer mx-auto sm:mx-0"
             >
-              <span>Continue the Adventure</span>
+              <span>Turn Page ➔ Continue the Story</span>
               <ArrowRight className="w-5 h-5 stroke-[3]" />
             </button>
           </div>
@@ -356,8 +395,20 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
             isLoading={isLoading}
           />
         ) : (
-          /* ACTIVE INTERACTION: 1 SIMPLE STEP */
+          /* ACTIVE INTERACTION SECTION */
           <div>
+            {/* EMBEDDED STORY-BASED MINI-GAME (IF APPLICABLE) */}
+            {shouldRenderMiniGame && (
+              <div className="mb-6">
+                <StoryMiniGame
+                  config={level.miniGame}
+                  topic={level.title + ' ' + level.expectedCoreConcept}
+                  onComplete={handleMiniGameComplete}
+                />
+              </div>
+            )}
+
+            {/* Checkpoint Prompt Header */}
             <div className="flex items-center justify-between gap-3 mb-4">
               <h3 className="text-base sm:text-lg font-black text-slate-900">
                 {level.interactionType === 'discover_tap' ? 'Ready to Discover?' : level.prompt}
