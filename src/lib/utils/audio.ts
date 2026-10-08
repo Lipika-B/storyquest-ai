@@ -1,9 +1,19 @@
-// Procedural audio effects using the native Web Audio API (zero audio files needed)
+// Procedural audio effects using the native Web Audio API (zero external audio files needed)
 
 let audioCtx: AudioContext | null = null;
+let soundEnabled = true;
+
+export function setSoundEnabled(enabled: boolean) {
+  soundEnabled = enabled;
+}
+
+export function getSoundEnabled(): boolean {
+  return soundEnabled;
+}
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
+  if (!soundEnabled) return null;
   if (!audioCtx) {
     const AudioCtxClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (AudioCtxClass) {
@@ -17,12 +27,13 @@ function getAudioContext(): AudioContext | null {
 }
 
 export function playSuccessChime() {
+  if (!soundEnabled) return;
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (cheerful arpeggio)
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (cheerful chime)
 
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
@@ -47,6 +58,7 @@ export function playSuccessChime() {
 }
 
 export function playEncouragementChime() {
+  if (!soundEnabled) return;
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
@@ -77,6 +89,7 @@ export function playEncouragementChime() {
 }
 
 export function playStarEarnedSound() {
+  if (!soundEnabled) return;
   try {
     const ctx = getAudioContext();
     if (!ctx) return;

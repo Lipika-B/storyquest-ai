@@ -1,39 +1,69 @@
 export type AgeBand = 'early' | 'middle' | 'upper';
 
-export type StorySetting = 'forest' | 'space' | 'school' | 'everyday' | 'fantasy';
-export type CharacterStyle = 'child' | 'animal' | 'robot' | 'fantasy';
-export type LearningStyle = 'adventure' | 'mystery' | 'real-life';
+export type StoryWorld = 
+  | 'space' 
+  | 'forest' 
+  | 'city' 
+  | 'school' 
+  | 'kitchen' 
+  | 'ocean' 
+  | 'village' 
+  | 'fantasy' 
+  | 'cyber'
+  | 'everyday'
+  | 'custom';
+
+export type CompanionType = 
+  | 'robot' 
+  | 'animal' 
+  | 'child' 
+  | 'magical' 
+  | 'monster'
+  | 'custom';
+
+export type LearningStyle = 
+  | 'adventure' 
+  | 'mystery' 
+  | 'real-life' 
+  | 'discovery' 
+  | 'rescue';
 
 export interface ParentSetup {
   childName: string;
   childAge: number;
   topic: string;
-  specificNeed: string;
-  setting: StorySetting;
-  characterStyle: CharacterStyle;
-  learningStyle: LearningStyle;
-  realWorldContext: string;
+  learningGoal: string; // What the child should understand after the story
+  struggle?: string;    // What the child struggles with
+  interest?: string;    // What the child enjoys (animals, space, cooking, dinosaurs, etc.)
+  storyWorld?: StoryWorld | string;
+  companionType?: CompanionType | string;
+  learningStyle?: LearningStyle | string;
 }
 
-export type CheckpointType = 'own_words' | 'prediction' | 'choice';
+export type CheckpointType = 'choice' | 'prediction' | 'own_words';
 
 export interface Checkpoint {
   id: string;
   type: CheckpointType;
   prompt: string;
+  kikiDialogue: string;
   characterSpeaker: string;
-  characterDialogue: string;
-  options?: string[]; // for prediction or choice
+  characterDialogue?: string;
+  options?: string[]; // for choice or prediction
   expectedCoreConcept: string;
   scaffoldingHint: string;
 }
 
 export interface StoryChapter {
   chapterNumber: number;
+  phase: 'spark' | 'puzzle' | 'triumph'; // 1: The Spark, 2: The Puzzle, 3: The Triumph
   title: string;
-  storyText: string[];
-  keyConceptHighlight: string;
-  badgeEmoji: string;
+  sceneSetting: string;
+  sceneEmoji: string;
+  kikiExpression: 'happy' | 'thinking' | 'curious' | 'cheering' | 'explaining';
+  kikiDialogue: string;
+  narrativeParagraphs: string[];
+  keyConceptHook: string;
   checkpoint: Checkpoint;
 }
 
@@ -60,7 +90,8 @@ export interface EvaluationResult {
 
 export interface AdaptiveScaffolding {
   encouragingNote: string;
-  characterGuidance: string;
+  kikiExpression: 'thinking' | 'explaining';
+  kikiDialogue: string;
   alternateAnalogy: string;
   realWorldConnection: string;
   followUpPrompt: string;
@@ -90,7 +121,7 @@ export interface NextLearningActivity {
 export interface LearningReport {
   id: string;
   topic: string;
-  specificNeed: string;
+  learningGoal: string;
   childName: string;
   childAge: number;
   ageBandLabel: string;
@@ -111,6 +142,6 @@ export interface QuestSession {
   chapters: StoryChapter[];
   starsEarned: number;
   interactions: ChildInteraction[];
-  status: 'story' | 'checkpoint' | 'scaffolding' | 'completed';
+  status: 'welcome' | 'story' | 'checkpoint' | 'scaffolding' | 'completed';
   activeScaffolding?: AdaptiveScaffolding;
 }

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { AdaptiveScaffolding } from '@/lib/types/quest';
-import { Sparkles, RefreshCw, Heart, ArrowRight, Check } from 'lucide-react';
+import { KikiCharacter } from '../kiki/KikiCharacter';
+import { ArrowRight, Check } from 'lucide-react';
 
 interface TryAgainDifferentlyProps {
   scaffolding: AdaptiveScaffolding;
@@ -24,15 +25,13 @@ export const TryAgainDifferentlyView: React.FC<TryAgainDifferentlyProps> = ({
   };
 
   return (
-    <section aria-labelledby="adaptive-title" className="bg-gradient-to-b from-amber-50 to-orange-50/50 border-2 border-amber-300 rounded-3xl p-6 sm:p-8 shadow-sm mb-6 animate-fadeIn">
-      {/* Supportive Header (Never says 'Wrong') */}
-      <div className="flex items-center gap-3 mb-5">
-        <span className="w-10 h-10 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center text-xl font-black shadow-sm">
-          💡
-        </span>
+    <section aria-labelledby="adaptive-title" className="bg-gradient-to-b from-amber-50 to-orange-50/60 border-2 border-amber-300 rounded-3xl p-6 sm:p-8 shadow-md mb-6 animate-fadeIn">
+      {/* KIKI Supportive Header (Never says 'Wrong'!) */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-amber-200 pb-5 mb-5">
+        <KikiCharacter expression="explaining" size="sm" />
         <div>
-          <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-900 bg-amber-200/80 px-2.5 py-0.5 rounded-full border border-amber-300">
-            Try Again, Differently
+          <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900 border border-amber-300">
+            Let's Try Differently! 💡
           </span>
           <h3 id="adaptive-title" className="text-lg sm:text-xl font-black text-slate-900 mt-1">
             {scaffolding.encouragingNote}
@@ -40,26 +39,26 @@ export const TryAgainDifferentlyView: React.FC<TryAgainDifferentlyProps> = ({
         </div>
       </div>
 
-      {/* Character Guidance speech bubble */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white border border-amber-200 shadow-xs mb-5">
+      {/* Alternate Real-World Analogy speech bubble */}
+      <div className="p-5 rounded-2xl bg-white border border-amber-200 shadow-xs mb-6">
         <p className="text-sm sm:text-base font-bold text-amber-950 mb-2 italic">
-          {scaffolding.characterGuidance}
+          {scaffolding.kikiDialogue}
         </p>
         <p className="text-sm sm:text-base text-slate-800 leading-relaxed font-medium">
           {scaffolding.alternateAnalogy}
         </p>
 
         {scaffolding.realWorldConnection && (
-          <div className="mt-3 pt-3 border-t border-amber-100 flex items-center gap-2 text-xs font-semibold text-amber-900">
+          <div className="mt-3 pt-3 border-t border-amber-100 flex items-center gap-2 text-xs font-bold text-amber-900">
             <span className="text-sm">🌟</span>
-            <span><strong>Everyday Connection:</strong> {scaffolding.realWorldConnection}</span>
+            <span><strong>Everyday Clue:</strong> {scaffolding.realWorldConnection}</span>
           </div>
         )}
       </div>
 
-      {/* Scaffolded Follow-up Mini-Challenge */}
+      {/* Guided Follow-up Mini-Challenge */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="text-sm sm:text-base font-extrabold text-slate-900">
+        <div className="text-sm sm:text-base font-black text-slate-900">
           {scaffolding.followUpPrompt}
         </div>
 
@@ -92,7 +91,7 @@ export const TryAgainDifferentlyView: React.FC<TryAgainDifferentlyProps> = ({
           <button
             type="submit"
             disabled={isLoading || !selectedOption}
-            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-amber-950 font-black text-base shadow-md shadow-amber-500/20 flex items-center justify-center gap-2.5 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-amber-950 font-black text-base shadow-md shadow-amber-400/20 flex items-center justify-center gap-2.5 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (
               <>
@@ -101,8 +100,8 @@ export const TryAgainDifferentlyView: React.FC<TryAgainDifferentlyProps> = ({
               </>
             ) : (
               <>
-                <span>I See It Now! Continue Quest</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>I See It Now! Continue Adventure</span>
+                <ArrowRight className="w-4 h-4 stroke-[3]" />
               </>
             )}
           </button>

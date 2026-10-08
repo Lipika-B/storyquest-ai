@@ -4,8 +4,8 @@
 
 :root {
   --foreground-rgb: 15, 23, 42;
-  --background-start-rgb: 248, 250, 252;
-  --background-end-rgb: 241, 245, 249;
+  --background-start-rgb: 254, 252, 246; /* warm cream storybook paper */
+  --background-end-rgb: 240, 249, 255;   /* gentle soft sky */
 }
 
 body {
@@ -19,42 +19,61 @@ body {
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
-/* Custom scrollbars for child-friendly readability */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* High-contrast focus rings for WCAG 2.1 AA accessibility */
+/* Accessible focus outline */
 *:focus-visible {
   outline: 3px solid #0284c7;
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
-@keyframes float-subtle {
-  0%, 100% { transform: translateY(0px); }
+/* Animations for KIKI and storybook elements */
+@keyframes kikiFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+@keyframes spinSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes bounceSubtle {
+  0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
 
-.animate-float {
-  animation: float-subtle 3s ease-in-out infinite;
+@keyframes pulseGold {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.9; }
 }
 
-@keyframes pulse-gold {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.05); }
+.animate-kiki-float {
+  animation: kikiFloat 3s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounceSubtle 2.5s ease-in-out infinite;
 }
 
 .animate-star {
-  animation: pulse-gold 1.5s ease-in-out infinite;
+  animation: pulseGold 1.5s ease-in-out infinite;
+}
+
+/* Accessibility: Respect user reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

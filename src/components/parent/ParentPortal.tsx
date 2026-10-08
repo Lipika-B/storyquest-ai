@@ -2,16 +2,17 @@
 
 import React from 'react';
 import { SetupForm } from './SetupForm';
-import { CurriculumPresets } from './CurriculumPresets';
+import { TopicLibraryPicker } from './TopicLibraryPicker';
 import { ParentSetup, QuestSession } from '@/lib/types/quest';
-import { CurriculumPreset } from '@/lib/ai/mockData';
-import { Compass, Sparkles, BookOpen, BarChart3, ArrowRight, ShieldCheck } from 'lucide-react';
+import { TopicPreset } from '@/lib/data/topicLibrary';
+import { KikiCharacter } from '../kiki/KikiCharacter';
+import { Sparkles, ArrowRight, BarChart3, ShieldCheck, HeartHandshake, Lightbulb } from 'lucide-react';
 
 interface ParentPortalProps {
   setup: ParentSetup;
   onChangeSetup: (newSetup: ParentSetup) => void;
-  onSelectPreset: (preset: CurriculumPreset) => void;
-  selectedPresetId?: string;
+  onSelectTopicPreset: (preset: TopicPreset) => void;
+  selectedTopicId?: string;
   onGenerateQuest: () => void;
   isLoading: boolean;
   activeSession: QuestSession | null;
@@ -22,8 +23,8 @@ interface ParentPortalProps {
 export const ParentPortal: React.FC<ParentPortalProps> = ({
   setup,
   onChangeSetup,
-  onSelectPreset,
-  selectedPresetId,
+  onSelectTopicPreset,
+  selectedTopicId,
   onGenerateQuest,
   isLoading,
   activeSession,
@@ -32,39 +33,46 @@ export const ParentPortal: React.FC<ParentPortalProps> = ({
 }) => {
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6">
-      {/* Hero Banner */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold mb-3">
-          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-          <span>Parent & Teacher Learning Studio</span>
+      {/* Brand Hero with KIKI Companion */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8 text-center sm:text-left bg-gradient-to-r from-amber-50 via-sky-50 to-amber-50 border-2 border-amber-200/80 rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div className="max-w-xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-200 text-amber-950 text-xs font-black uppercase tracking-wider mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+            <span>KIKI • Little stories. Big discoveries.</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+            Teach any topic through a story <br className="hidden sm:inline" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">
+              your child won’t want to stop reading.
+            </span>
+          </h1>
+          <p className="mt-2.5 text-sm sm:text-base text-slate-700 font-medium">
+            Set what your child should learn. KIKI crafts an age-appropriate adventure, checks real understanding, and adapts the lesson if they struggle.
+          </p>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Teach any topic through a story <br className="hidden sm:inline" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-indigo-600">
-            a child won’t want to stop reading.
-          </span>
-        </h1>
-        <p className="mt-3 text-base text-slate-600 max-w-2xl mx-auto">
-          Personalize an adventure, see how the lesson dynamically adapts when the child struggles, and review evidence-based learning insights afterwards.
-        </p>
+
+        {/* KIKI Friendly Mascot */}
+        <div className="flex-shrink-0">
+          <KikiCharacter expression="happy" size="lg" />
+        </div>
       </div>
 
       {/* Active Session Quick-Resume Pill */}
       {activeSession && (
-        <div className="mb-8 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+        <div className="mb-8 p-4 rounded-2xl bg-amber-100/70 border border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{activeSession.chapters[activeSession.currentChapterIndex]?.badgeEmoji || '⭐'}</span>
+            <span className="text-2xl">{activeSession.chapters[activeSession.currentChapterIndex]?.sceneEmoji || '⭐'}</span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-amber-900 uppercase tracking-wide">
+                <span className="text-xs font-black text-amber-950 uppercase tracking-wide">
                   Active Adventure In Progress
                 </span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-950">
                   Chapter {activeSession.currentChapterIndex + 1} of {activeSession.chapters.length}
                 </span>
               </div>
               <p className="text-sm font-bold text-slate-900">
-                {activeSession.setup.childName}’s Quest: {activeSession.setup.topic}
+                {activeSession.setup.childName}’s Adventure: {activeSession.setup.topic}
               </p>
             </div>
           </div>
@@ -72,15 +80,15 @@ export const ParentPortal: React.FC<ParentPortalProps> = ({
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <button
               onClick={onJumpToQuest}
-              className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all"
+              className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
             >
-              <span>Resume Child Quest</span>
+              <span>Enter Adventure with KIKI</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
             {activeSession.interactions.length > 0 && (
               <button
                 onClick={onViewReport}
-                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-amber-300 text-amber-900 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-amber-300 text-amber-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
               >
                 <BarChart3 className="w-3.5 h-3.5" />
                 <span>View Report</span>
@@ -90,13 +98,13 @@ export const ParentPortal: React.FC<ParentPortalProps> = ({
         </div>
       )}
 
-      {/* 1-Click Curriculum Presets */}
-      <CurriculumPresets
-        onSelectPreset={onSelectPreset}
-        selectedPresetId={selectedPresetId}
+      {/* 1. Curated KIKI Topic Worlds */}
+      <TopicLibraryPicker
+        onSelectTopicPreset={onSelectTopicPreset}
+        selectedTopicId={selectedTopicId}
       />
 
-      {/* Detailed Setup Form */}
+      {/* 2. Focused Setup Form */}
       <SetupForm
         setup={setup}
         onChangeSetup={onChangeSetup}
@@ -104,19 +112,19 @@ export const ParentPortal: React.FC<ParentPortalProps> = ({
         isLoading={isLoading}
       />
 
-      {/* Trust & Methodology Footnote */}
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-500">
-        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/60">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-          <span><strong>No sterile quizzes:</strong> Understanding is verified inside the story context.</span>
+      {/* Three Pillars Footnote */}
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-600">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-start gap-3">
+          <HeartHandshake className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+          <span><strong>The story is the product:</strong> Real narrative puzzles replace sterile quizzes.</span>
         </div>
-        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/60">
-          <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-          <span><strong>'Try Again, Differently':</strong> Mistakes trigger fresh analogies, never a "Wrong" mark.</span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-start gap-3">
+          <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <span><strong>'Try Again, Differently':</strong> Mistakes trigger fresh analogies—never a "Wrong" mark.</span>
         </div>
-        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/60">
-          <BarChart3 className="w-4 h-4 text-sky-600 flex-shrink-0 mt-0.5" />
-          <span><strong>Evidence-based reporting:</strong> Verbatim quotes and concrete home activities.</span>
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-start gap-3">
+          <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+          <span><strong>Evidence-based insights:</strong> Verbatim quotes and concrete home activities.</span>
         </div>
       </div>
     </div>

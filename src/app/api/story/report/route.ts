@@ -2,32 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { LearningReport, ParentSetup, ChildInteraction } from '@/lib/types/quest';
 import { callGeminiJSON } from '@/lib/ai/gemini';
 import { buildReportPrompt, getAgeBandDescription } from '@/lib/ai/prompts';
-import { CURRICULUM_PRESETS } from '@/lib/ai/mockData';
 
 export async function POST(req: NextRequest) {
   let body: any = null;
   try {
     body = await req.json();
-    const { setup, interactions, starsEarned, presetId } = body;
+    const { setup, interactions, starsEarned } = body;
 
     if (!setup || !interactions) {
       return NextResponse.json(
         { error: 'Setup and interactions are required.' },
         { status: 400 }
       );
-    }
-
-    // If matches preset and interactions are typical, we can use/augment the authored report
-    if (presetId) {
-      const preset = CURRICULUM_PRESETS.find(p => p.id === presetId);
-      if (preset && (!interactions.length || interactions.every((i: ChildInteraction) => i.demonstratedConcept))) {
-        return NextResponse.json<LearningReport>({
-          ...preset.demoReport,
-          childName: setup.childName || preset.demoReport.childName,
-          childAge: setup.childAge || preset.demoReport.childAge,
-          totalStars: starsEarned ?? 3,
-        });
-      }
     }
 
     // Synthesize report via Gemini
@@ -47,7 +33,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Error in /api/story/report:', error);
     const emergencyReport = synthesizeLocalReport(
-      body?.setup || { childName: 'Explorer', childAge: 8, topic: 'Learning Adventure' },
+      body?.setup || { childName: 'Explorer', childAge: 8, topic: 'Learning Adventure', learningGoal: 'Core Discovery' },
       body?.interactions || [],
       body?.starsEarned || 3
     );
@@ -80,55 +66,55 @@ function synthesizeLocalReport(
   const conceptsDemonstrated = interactions
     .filter(i => i.demonstratedConcept)
     .map(i => ({
-      concept: `Key Milestone (Chapter ${i.chapterNumber})`,
+      concept: `Chapter ${i.chapterNumber} Milestone (${setup.topic})`,
       evidenceQuote: `“${i.childResponse.trim() || 'Applied reasoning correctly'}”`,
-      observation: i.positiveEvidence[0] || 'Successfully connected the story context to the underlying school concept.'
+      observation: i.positiveEvidence[0] || `Demonstrated intuitive grasp of ${setup.learningGoal}.`
     }));
 
   if (conceptsDemonstrated.length === 0) {
     conceptsDemonstrated.push({
-      concept: 'Curiosity & Active Participation',
+      concept: `Active Exploration (${setup.topic})`,
       evidenceQuote: '“Explored the story scenes and engaged with each checkpoint.”',
-      observation: 'Willingness to experiment and test hypotheses during the narrative.'
+      observation: 'Willingness to experiment with ideas and follow KIKI’s companion cues.'
     });
   }
 
   const conceptsNeedingReinforcement = interactions
     .filter(i => i.scaffoldingUsed || !i.demonstratedConcept)
     .map(i => ({
-      concept: `Initial Hesitation (Chapter ${i.chapterNumber})`,
-      diagnosedHurdle: i.misconceptionIdentified || 'Benefited from real-world visual analogy before full confidence clicked.',
-      recommendation: 'Reinforce using physical manipulatives or real-world comparisons rather than abstract rules.'
+      concept: `Initial Hesitation in Chapter ${i.chapterNumber}`,
+      diagnosedHurdle: i.misconceptionIdentified || setup.struggle || 'Benefited from an alternate hands-on analogy before full confidence clicked.',
+      recommendation: `Use tangible everyday objects connected to ${setup.interest || 'daily routines'} rather than abstract drill sheets.`
     }));
 
   return {
-    id: `report-${Date.now()}`,
+    id: `kiki-report-${Date.now()}`,
     topic: setup.topic,
-    specificNeed: setup.specificNeed || 'Core concept exploration',
+    learningGoal: setup.learningGoal,
     childName: setup.childName || 'Explorer',
     childAge: setup.childAge,
     ageBandLabel: band,
     estimatedMastery,
-    masterySummary: `${setup.childName || 'The learner'} engaged actively in the ${setup.topic} adventure. Based on their responses across 3 quest checkpoints, they showed ${estimatedMastery.toLowerCase()} of the foundational mechanisms, particularly when supported by story-driven analogies.`,
+    masterySummary: `${setup.childName || 'The learner'} completed KIKI’s ${setup.topic} adventure. Based on their responses across 3 interactive chapters, they demonstrated ${estimatedMastery.toLowerCase()} of the learning goal: "${setup.learningGoal}".`,
     conceptsDemonstrated,
     conceptsNeedingReinforcement,
     cognitiveObservations: [
-      `Demonstrated highest engagement when the concept was framed through the ${setup.setting} setting.`,
-      `Showed clear positive response to the 'Try Again, Differently' scaffolding without frustration.`,
-      `Articulated thoughts well when invited to explain the mechanism in their own words.`
+      `Engaged enthusiastically with the ${setup.storyWorld || 'adventure'} story world and companion dialogue.`,
+      `Responded positively to KIKI’s 'Try Again, Differently' scaffolding without frustration.`,
+      `Demonstrated highest engagement when invited to explain the discovery in their own words.`
     ],
     suggestedNextActivities: [
       {
-        title: `Real-World Hands-On Test: ${setup.topic}`,
-        type: 'home_experiment',
-        description: `Explore ${setup.topic} during weekend routines (such as cooking, sorting items, or outdoor observation). Ask your child to show you what their story character discovered.`,
-        whyItHelps: 'Anchors the narrative learning into daily tactile memory.'
+        title: `Hands-On Activity: ${setup.topic}`,
+        type: 'hands_on_game',
+        description: `Explore ${setup.topic} using real-world items (like ${setup.interest || 'kitchen snacks, blocks, or toys'}). Ask your child to show you what KIKI discovered today!`,
+        whyItHelps: 'Anchors the narrative breakthrough into physical muscle memory.'
       },
       {
-        title: 'Story Recap Over Dinner',
+        title: 'Story Bedtime Chat',
         type: 'discussion',
-        description: `Ask: "If you had to teach your character one more trick about ${setup.topic}, what would you tell them?"`,
-        whyItHelps: 'Reinforces explanatory mastery through low-pressure conversation.'
+        description: `Ask: "If KIKI asked you to teach another friend about ${setup.topic}, how would you explain it?"`,
+        whyItHelps: 'Builds lasting retention through child-led verbal recall.'
       }
     ],
     totalStars: starsEarned,

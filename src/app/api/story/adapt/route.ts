@@ -2,29 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AdaptiveScaffolding, ParentSetup } from '@/lib/types/quest';
 import { callGeminiJSON } from '@/lib/ai/gemini';
 import { buildScaffoldingPrompt } from '@/lib/ai/prompts';
-import { CURRICULUM_PRESETS } from '@/lib/ai/mockData';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { question, childResponse, expectedConcept, misconception, setup, checkpointId } = body;
+    const { question, childResponse, expectedConcept, misconception, setup } = body;
 
-    // Check if preset has an authored alternate scaffolding first for instant reliability
-    if (checkpointId) {
-      for (const preset of CURRICULUM_PRESETS) {
-        if (preset.scaffolding[checkpointId]) {
-          return NextResponse.json<AdaptiveScaffolding>(preset.scaffolding[checkpointId]);
-        }
-      }
-    }
+    const safeSetup: ParentSetup = setup || {
+      childName: 'Explorer',
+      childAge: 8,
+      topic: 'Learning Concept',
+      learningGoal: expectedConcept || 'Understand the pattern',
+      interest: 'puzzles and games',
+      storyWorld: 'forest',
+      companionType: 'animal'
+    };
 
-    // Call Gemini to craft dynamic alternate scaffolding
+    // Attempt Gemini call
     const prompt = buildScaffoldingPrompt(
       question || 'Explain the concept',
       childResponse || '',
-      expectedConcept || '',
+      expectedConcept || safeSetup.learningGoal,
       misconception || null,
-      setup as ParentSetup
+      safeSetup
     );
 
     const aiResult = await callGeminiJSON<AdaptiveScaffolding>(prompt, {
@@ -36,30 +36,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json<AdaptiveScaffolding>(aiResult);
     }
 
-    // Reliable fallback scaffolding
+    // Dynamic contextual fallback scaffolding:
+    const interest = safeSetup.interest || 'everyday items';
     const fallbackScaffolding: AdaptiveScaffolding = {
-      encouragingNote: 'You took a fantastic step! Let’s picture this in our hands like building blocks.',
-      characterGuidance: '“Wait! Come look over here at this picture with me!”',
-      alternateAnalogy: `Instead of thinking about numbers or definitions, imagine you are holding this in your own hands. If you have equal piles or pieces, adding or sharing just changes how much each person gets!`,
-      realWorldConnection: `Just like sharing your favorite snack with friends or packing toys into boxes.`,
-      followUpPrompt: `Let’s test the secret together: which idea feels right?`,
+      encouragingNote: `KIKI says: "That was a clever guess! Let's look at this secret shortcut another way."`,
+      kikiExpression: 'explaining',
+      kikiDialogue: `“Wait! Don't worry about getting it on the first try. Let's imagine our ${interest} sitting right in front of us!”`,
+      alternateAnalogy: `Instead of trying to remember all the pieces at once, picture ${safeSetup.learningGoal}. When you look at equal groups or steps, adding one more piece makes the whole picture clear!`,
+      realWorldConnection: `Just like arranging ${interest} in neat rows or sharing snacks with friends!`,
+      followUpPrompt: `Let’s test the secret: How does this connect to our goal?`,
       options: [
-        `The pieces work together in equal amounts to build the whole`,
-        `It changes completely every time`,
+        `The pieces work together in equal amounts: ${safeSetup.learningGoal}`,
+        `We have to restart and count every single item from one again`
       ],
-      expectedConcept: expectedConcept || 'Equal parts making a whole',
+      expectedConcept: expectedConcept || safeSetup.learningGoal,
     };
 
     return NextResponse.json<AdaptiveScaffolding>(fallbackScaffolding);
   } catch (error) {
     console.error('Error in /api/story/adapt:', error);
     return NextResponse.json<AdaptiveScaffolding>({
-      encouragingNote: 'Let’s look at this secret shortcut together!',
-      characterGuidance: '“Let’s try a playful hands-on clue!”',
-      alternateAnalogy: 'Think of this like climbing stairs: take one step at a time!',
-      realWorldConnection: 'Every step gets you closer to the top.',
-      followUpPrompt: 'Which step gets us to the next milestone?',
-      options: ['Taking one steady step forward', 'Jumping all the way back to zero'],
+      encouragingNote: `KIKI says: "Let's explore this with an easier clue!"`,
+      kikiExpression: 'explaining',
+      kikiDialogue: `“Let's take it one step at a time together!”`,
+      alternateAnalogy: `Think of this like climbing a staircase: each step lifts you by the exact same height!`,
+      realWorldConnection: `One step at a time always gets us to the top.`,
+      followUpPrompt: `Which step gets us to our goal?`,
+      options: ['Taking one steady step forward together', 'Jumping all the way back to zero'],
       expectedConcept: 'Steady progress by equal steps',
     });
   }

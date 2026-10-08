@@ -5,12 +5,12 @@ export function getAgeBandDescription(age: number): { band: string; pedagogy: st
     return {
       band: 'Early Explorer (Ages 5-7)',
       pedagogy: `
-- Sentence structure: Very short, lively, clear sentences (maximum 8-12 words).
-- Tone: Playful, warm, sensory, magical. Use sound words (whoosh, pop, clang).
-- Metaphors: Concrete physical objects (straws, cookies, sponges, warm sun, big hugs).
-- Character: Cute, friendly personified creature or companion who feels like a peer.
-- Vocabulary: Simple everyday words. Do NOT use complex scientific jargon without immediately grounding it in a physical sensation.
-- Questions: Focus on what characters see, feel, or do directly.
+- Sentence structure: Very short, lively, clear sentences (maximum 8-10 words per sentence).
+- Tone: Playful, warm, sensory, magical. Use sound words (whoosh, pop, tap-tap).
+- Metaphors: Concrete physical objects (straws, cookies, building blocks, warm sun, hugs).
+- Companion & KIKI: Speak like a sweet, enthusiastic friend.
+- Language: Everyday simple English. Avoid complicated explanations or adult instructions.
+- Questions: Focus on what characters see, touch, or do directly.
       `.trim()
     };
   } else if (age <= 10) {
@@ -19,9 +19,9 @@ export function getAgeBandDescription(age: number): { band: string; pedagogy: st
       pedagogy: `
 - Sentence structure: Dynamic compound sentences, active narrative pacing.
 - Tone: Adventurous, inquisitive, mystery-solving. Treat the child as a fellow investigator.
-- Metaphors: Mechanisms, cause-and-effect, stepping stones, recipes, gears, codes.
-- Character: A clever young inventor, explorer, or robot who encounters practical problems.
-- Vocabulary: Introduce key school terminology with clear contextual explanations.
+- Metaphors: Stepping stones, recipes, gears, trays, secret codes, cause and effect.
+- Companion & KIKI: Encouraging partners cracking the case together.
+- Language: Clear, engaging vocabulary with concepts explained through hands-on actions.
 - Questions: Ask for step-by-step logic, connections, and predictions.
       `.trim()
     };
@@ -29,12 +29,12 @@ export function getAgeBandDescription(age: number): { band: string; pedagogy: st
     return {
       band: 'Master Sleuth (Ages 11-13)',
       pedagogy: `
-- Sentence structure: Sophisticated narrative structure, scientific/conceptual tension.
+- Sentence structure: Sophisticated narrative pacing, conceptual tension.
 - Tone: Intelligent, high-stakes exploration, respectful of emerging autonomy.
-- Metaphors: Systems, variables, proportional balance, real-world engineering or scientific models.
-- Character: A skilled technician, cadet, or young specialist dealing with system puzzles.
-- Vocabulary: Use precise conceptual terminology (e.g., denominator, chlorophyll, kinetic, equilibrium).
-- Questions: Focus on mechanism, "why does this rule hold", and edge cases.
+- Metaphors: Systems, variables, proportional balance, inverse relationships, real-world models.
+- Companion & KIKI: Capable teammates facing technical/scientific dilemmas.
+- Language: Use precise conceptual terminology (e.g., denominator, photosynthesis, privacy, equilibrium).
+- Questions: Focus on mechanisms, "why this rule holds", and edge cases.
       `.trim()
     };
   }
@@ -43,82 +43,97 @@ export function getAgeBandDescription(age: number): { band: string; pedagogy: st
 export function buildStoryPrompt(setup: ParentSetup): string {
   const { band, pedagogy } = getAgeBandDescription(setup.childAge);
 
-  return `You are StoryQuest AI, a world-class pedagogical storyteller.
-Create an engaging 3-chapter learning adventure for a child named "${setup.childName}" (Age ${setup.childAge}, ${band}).
+  return `You are KIKI AI, an extraordinary children's storytelling companion.
+Tagline: "Little stories. Big discoveries."
+Create a personalized 3-chapter story adventure for ${setup.childName} (Age ${setup.childAge}, ${band}).
 
-LEARNING MISSION:
+MISSION PARAMETERS:
 - Topic: "${setup.topic}"
-- Specific Learning Need / Goal: "${setup.specificNeed}"
-- Story Setting: "${setup.setting}"
-- Character Style: "${setup.characterStyle}"
-- Learning Style: "${setup.learningStyle}"
-- Real-World Context: "${setup.realWorldContext}"
+- Core Learning Goal: "${setup.learningGoal}"
+- Specific Struggle/Misconception: "${setup.struggle || 'General confusion about the concept'}"
+- Story World: "${setup.storyWorld || 'space'}"
+- Companion Type: "${setup.companionType || 'robot'}"
+- Child Interest / Context: "${setup.interest || 'rockets and space fuel'}"
+- Learning Style: "${setup.learningStyle || 'adventure'}"
 
-STRICT PEDAGOGICAL GUIDELINES FOR AGE ${setup.childAge}:
+AGE PEDAGOGY RULES (AGE ${setup.childAge}):
 ${pedagogy}
 
-STORY STRUCTURE:
-- Chapter 1 (The Spark of Discovery): Introduce the setting, the companion character, and the initial dilemma where the school concept first appears naturally.
-  End with Checkpoint 1 (Type: "choice" or "prediction").
-- Chapter 2 (The Puzzle Crossroads): The dilemma deepens. The child must solve the core challenge.
-  End with Checkpoint 2 (Type: "own_words" - MUST ask the child to explain the core concept in their own words to help the character!).
-- Chapter 3 (The Master Triumph): Celebrating the successful application of the concept and looking ahead.
-  End with Checkpoint 3 (Type: "prediction" or "choice" testing generalization of the concept).
-
-CRITICAL REQUIREMENT:
-The educational concept must remain 100% mathematically and scientifically accurate while feeling like a natural, thrilling part of the story.
+CRITICAL STORYTELLING RULES:
+1. THE STORY IS THE PRODUCT. Do NOT make this a generic textbook with a wrapper.
+2. Weave the concept naturally into the story problem.
+   Example: If multiplication 7x6 is taught in space with rockets, show a rocket with 7 trays needing 6 fuel crystals each.
+3. Chapter 1 (The Spark): Introduce KIKI, the companion, the setting, and the story problem naturally. End with Checkpoint 1 (Choice).
+4. Chapter 2 (The Puzzle): The characters encounter a puzzle using the concept. End with Checkpoint 2 (Explain in your own words).
+5. Chapter 3 (The Triumph): The child solves the dilemma with the concept! End with Checkpoint 3 (Prediction of what happens next).
+6. KIKI is a cute, friendly, enthusiastic guide who appears in each chapter.
 
 Respond strictly with valid JSON conforming to this schema (no markdown fences, just pure JSON):
 {
   "chapters": [
     {
       "chapterNumber": 1,
+      "phase": "spark",
       "title": "string",
-      "badgeEmoji": "string (1 emoji)",
-      "keyConceptHighlight": "string (1 punchy sentence)",
-      "storyText": ["paragraph 1", "paragraph 2", "paragraph 3"],
+      "sceneSetting": "string",
+      "sceneEmoji": "string (1 emoji)",
+      "kikiExpression": "curious",
+      "kikiDialogue": "Short greeting and excitement from Kiki",
+      "narrativeParagraphs": ["paragraph 1", "paragraph 2", "paragraph 3"],
+      "keyConceptHook": "string (1 punchy line)",
       "checkpoint": {
         "id": "c1",
         "type": "choice",
-        "prompt": "string",
-        "characterSpeaker": "string",
-        "characterDialogue": "string",
-        "options": ["Option A", "Option B", "Option C", "Option D"],
-        "expectedCoreConcept": "string",
-        "scaffoldingHint": "string"
+        "prompt": "Story-based question asking child how to help",
+        "kikiDialogue": "Kiki asking child for help",
+        "characterSpeaker": "Companion Name",
+        "characterDialogue": "Companion line",
+        "options": ["Option A (Correct)", "Option B (Distractor)", "Option C (Distractor)"],
+        "expectedCoreConcept": "${setup.learningGoal}",
+        "scaffoldingHint": "Gentle friendly clue"
       }
     },
     {
       "chapterNumber": 2,
+      "phase": "puzzle",
       "title": "string",
-      "badgeEmoji": "string (1 emoji)",
-      "keyConceptHighlight": "string",
-      "storyText": ["paragraph 1", "paragraph 2", "paragraph 3"],
+      "sceneSetting": "string",
+      "sceneEmoji": "string (1 emoji)",
+      "kikiExpression": "thinking",
+      "kikiDialogue": "Encouragement from Kiki",
+      "narrativeParagraphs": ["paragraph 1", "paragraph 2", "paragraph 3"],
+      "keyConceptHook": "string",
       "checkpoint": {
         "id": "c2",
         "type": "own_words",
-        "prompt": "string (asking child to explain the core concept in their own words to help the character)",
-        "characterSpeaker": "string",
-        "characterDialogue": "string",
-        "expectedCoreConcept": "string",
-        "scaffoldingHint": "string"
+        "prompt": "Kiki asks: In your own words, can you explain how this works?",
+        "kikiDialogue": "Kiki asking child to explain in their own words (no stress on spelling!)",
+        "characterSpeaker": "Companion Name",
+        "characterDialogue": "Companion line",
+        "expectedCoreConcept": "${setup.learningGoal}",
+        "scaffoldingHint": "Gentle friendly clue"
       }
     },
     {
       "chapterNumber": 3,
+      "phase": "triumph",
       "title": "string",
-      "badgeEmoji": "string (1 emoji)",
-      "keyConceptHighlight": "string",
-      "storyText": ["paragraph 1", "paragraph 2", "paragraph 3"],
+      "sceneSetting": "string",
+      "sceneEmoji": "string (1 emoji)",
+      "kikiExpression": "cheering",
+      "kikiDialogue": "Celebration from Kiki",
+      "narrativeParagraphs": ["paragraph 1", "paragraph 2", "paragraph 3"],
+      "keyConceptHook": "string",
       "checkpoint": {
         "id": "c3",
         "type": "prediction",
-        "prompt": "string",
-        "characterSpeaker": "string",
-        "characterDialogue": "string",
-        "options": ["Option A", "Option B", "Option C", "Option D"],
-        "expectedCoreConcept": "string",
-        "scaffoldingHint": "string"
+        "prompt": "Prediction question for next adventure",
+        "kikiDialogue": "Kiki prompt",
+        "characterSpeaker": "Companion Name",
+        "characterDialogue": "Companion line",
+        "options": ["Option A (Correct prediction)", "Option B", "Option C"],
+        "expectedCoreConcept": "${setup.learningGoal}",
+        "scaffoldingHint": "Gentle friendly clue"
       }
     }
   ]
@@ -131,33 +146,34 @@ export function buildEvaluationPrompt(
   expectedCoreConcept: string,
   childAge: number
 ): string {
-  return `You are an expert pedagogical evaluator assessing a child's understanding.
+  return `You are KIKI, a warm, supportive educational companion evaluating a child's response.
 Child Age: ${childAge}
 Question Prompt: "${promptText}"
-Expected Core Concept: "${expectedCoreConcept}"
-Child's Response: "${childResponse}"
+Target Concept / Learning Goal: "${expectedCoreConcept}"
+Child's Words: "${childResponse}"
 
-CRITICAL EVALUATION RULES:
-1. FOCUS ON CONCEPTUAL UNDERSTANDING ONLY.
-2. DO NOT judge grammar, spelling, punctuation, capitalization, or sentence elegance. A child might write "becuz 5 is 35 and add 7" - this demonstrates understanding!
-3. If the child shows the central insight or mechanism, mark understood as true.
-4. If the child is confused, missed the relationship, or guessed wildly, mark understood as false and diagnose the specific hurdle.
-5. In friendlyFeedback, ALWAYS be encouraging, warm, and speak to the child with joy. NEVER say "Wrong" or "Incorrect".
+EVALUATION PRINCIPLES:
+1. FOCUS STRICTLY ON CONCEPTUAL UNDERSTANDING.
+2. ABSOLUTELY IGNORE spelling errors, punctuation, capitalization, imperfect grammar, or broken phrasing.
+   (e.g., if a 9-year-old says "cuz 7 tray has 6 and 5 tray was 35 so add 7 is 42", this is 100% understood!)
+3. If the child shows intuitive grasp of the relationship, mark understood: true.
+4. If the child is confused, guessed randomly, or shows the misconception, mark understood: false and diagnose the hurdle gently.
+5. In friendlyFeedback, speak as KIKI: joyful, warm, cheering! NEVER say "Wrong" or "Incorrect".
 
 Respond strictly with valid JSON (no markdown fences, just pure JSON):
 {
   "understood": true,
-  "positiveElementsFound": ["specific concept element recognized in child's words"],
+  "positiveElementsFound": ["what concept the child grasped"],
   "misconceptionIdentified": null,
-  "friendlyFeedback": "Warm, encouraging 1-2 sentence response to the child praising their insight",
+  "friendlyFeedback": "Kiki celebration line praising their exact insight",
   "nextAction": "advance"
 }
 (or if understood is false):
 {
   "understood": false,
-  "positiveElementsFound": ["any piece they got right or good effort shown"],
-  "misconceptionIdentified": "Short pedagogical diagnosis of what confused them",
-  "friendlyFeedback": "Warm, supportive message saying what a cool try that was and getting ready to look at it differently",
+  "positiveElementsFound": ["any good effort or partial idea noticed"],
+  "misconceptionIdentified": "Short friendly diagnosis of what tripped them up",
+  "friendlyFeedback": "Kiki supportive line saying: 'That was a super try! Let's peek at this another way...'",
   "nextAction": "try_differently"
 }`;
 }
@@ -171,29 +187,29 @@ export function buildScaffoldingPrompt(
 ): string {
   const { band } = getAgeBandDescription(setup.childAge);
 
-  return `You are StoryQuest AI's adaptive learning engine creating a "Try Again, Differently" moment.
+  return `You are KIKI creating a supportive "Try Again, Differently" learning moment.
 Child: ${setup.childName} (Age ${setup.childAge}, ${band})
-Story Setting: ${setup.setting}
-Character Style: ${setup.characterStyle}
-Real-World Context: ${setup.realWorldContext}
+Story Setting: ${setup.storyWorld}
+Companion: ${setup.companionType}
+Child Interest / Context: ${setup.interest}
 Original Question: "${question}"
 Child's Attempt: "${childResponse}"
 Core Concept: "${expectedConcept}"
-Diagnosed Hurdle: "${misconception || 'Uncertainty about the underlying rule'}"
+Hurdle: "${misconception || 'Needs a different analogy'}"
 
-MISSION:
-The child struggled with this concept. Provide an ALTERNATE TEACHING ANGLE.
-Do NOT just repeat the same explanation.
-- Shift to a tangible, physical real-world comparison connected to ${setup.realWorldContext} or ${setup.setting}.
-- Have the story character guide them with warmth and zero judgment.
-- Present a scaffolded mini-question with 2-3 simple choices so the child can easily succeed and build confidence.
+TEACHING MISSION:
+Change the teaching approach completely.
+- Switch from the previous story mechanic to an alternate, tangible real-world analogy connected to ${setup.interest || 'everyday objects like blocks or pizza'}.
+- KIKI speaks with warmth, excitement, and zero judgment (Never say "Wrong"!).
+- Provide a simple follow-up question with 2-3 clear options so the child succeeds and continues the adventure!
 
 Respond strictly with valid JSON (no markdown fences, just pure JSON):
 {
-  "encouragingNote": "Great effort! Let's look at this secret a whole new way...",
-  "characterGuidance": "Character speaking with encouragement and warmth",
-  "alternateAnalogy": "A fresh, vivid physical analogy (e.g. baking trays, sharing toys, stepping stones)",
-  "realWorldConnection": "Direct link to child's everyday world",
+  "encouragingNote": "Kiki says: 'Wait! Let's look at this secret a whole new way...'",
+  "kikiExpression": "explaining",
+  "kikiDialogue": "Warm explanation from Kiki",
+  "alternateAnalogy": "A fresh physical analogy (e.g. cookie trays, sharing toys, stepping stones)",
+  "realWorldConnection": "Direct link to their everyday world",
   "followUpPrompt": "A scaffolded question that makes the concept click",
   "options": ["Correct simple choice", "Friendly distractor"],
   "expectedConcept": "${expectedConcept}"
@@ -205,33 +221,33 @@ export function buildReportPrompt(
   interactions: ChildInteraction[],
   starsEarned: number
 ): string {
-  return `You are a master educational diagnostician and child learning specialist.
-Generate a comprehensive, evidence-based Parent/Teacher Learning Report for:
+  return `You are KIKI's Educational Insights Specialist.
+Generate an evidence-based Parent/Teacher Learning Report for:
 Child: ${setup.childName} (Age ${setup.childAge})
 Topic: "${setup.topic}"
-Specific Learning Need: "${setup.specificNeed}"
-Total Stars Earned: ${starsEarned}
+Learning Goal: "${setup.learningGoal}"
+Struggle Addressed: "${setup.struggle || 'None specified'}"
+Stars Earned: ${starsEarned}
 
-SESSION TRANSCRIPT & CHILD INTERACTIONS:
+CHILD'S TRANSCRIPT & INTERACTIONS:
 ${JSON.stringify(interactions, null, 2)}
 
 REPORT PHILOSOPHY:
 - Answer: "Did the child appear to understand the concept, and what should we do next?"
-- DO NOT claim definitive proof. Frame findings as an estimate based on session interactions.
-- Provide real evidence: quote the child's actual responses directly.
-- Diagnose specific hurdles constructively.
-- Suggest 2 concrete, engaging offline activities (kitchen math, home science, or bedtime conversation).
+- DO NOT claim definitive psychometric proof. Frame findings as an estimate based on session responses.
+- Cite direct quotes from the child as evidence of understanding or hesitation.
+- Suggest 2 concrete, engaging offline activities (kitchen math, home science, or conversation).
 
 Respond strictly with valid JSON (no markdown fences, just pure JSON):
 {
-  "id": "report-${Date.now()}",
+  "id": "kiki-report-${Date.now()}",
   "topic": "${setup.topic}",
-  "specificNeed": "${setup.specificNeed}",
+  "learningGoal": "${setup.learningGoal}",
   "childName": "${setup.childName}",
   "childAge": ${setup.childAge},
   "ageBandLabel": "Early Explorer / Curious Adventurer / Master Sleuth",
-  "estimatedMastery": "Developing Understanding",
-  "masterySummary": "Comprehensive 2-3 sentence overview of what the child demonstrated during the quest",
+  "estimatedMastery": "Strong Understanding",
+  "masterySummary": "Comprehensive 2-3 sentence overview of what the child demonstrated during the adventure",
   "conceptsDemonstrated": [
     {
       "concept": "Concept name",
@@ -248,21 +264,20 @@ Respond strictly with valid JSON (no markdown fences, just pure JSON):
   ],
   "cognitiveObservations": [
     "Specific observation 1",
-    "Specific observation 2",
-    "Specific observation 3"
+    "Specific observation 2"
   ],
   "suggestedNextActivities": [
     {
       "title": "Activity Title",
       "type": "home_experiment",
-      "description": "Step by step description of real world activity",
-      "whyItHelps": "Pedagogical rationale"
+      "description": "Step by step real-world activity",
+      "whyItHelps": "Why this anchors the learning"
     },
     {
       "title": "Discussion Title",
       "type": "discussion",
-      "description": "Conversation starter for car ride or dinner table",
-      "whyItHelps": "Pedagogical rationale"
+      "description": "Conversation prompt",
+      "whyItHelps": "Why this anchors the learning"
     }
   ],
   "totalStars": ${starsEarned},
