@@ -3,7 +3,6 @@
 import React from 'react';
 import { LearningReport } from '@/lib/types/quest';
 import { 
-  BarChart3, 
   CheckCircle2, 
   AlertCircle, 
   Lightbulb, 
@@ -11,8 +10,9 @@ import {
   ArrowLeft, 
   Sparkles, 
   Quote, 
-  Calendar,
-  Target
+  Target,
+  BookOpen,
+  Brain
 } from 'lucide-react';
 import { KikiCharacter } from '../kiki/KikiCharacter';
 
@@ -41,6 +41,18 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({
         return 'bg-sky-100 text-sky-900 border-sky-300';
       case 'Beginning Exploration':
         return 'bg-purple-100 text-purple-900 border-purple-300';
+    }
+  };
+
+  const getRatingBadge = (rating: string) => {
+    switch (rating) {
+      case 'Mastered':
+      case 'Strong':
+        return 'bg-emerald-100 text-emerald-900 border-emerald-300';
+      case 'Developing':
+        return 'bg-sky-100 text-sky-900 border-sky-300';
+      default:
+        return 'bg-amber-100 text-amber-900 border-amber-300';
     }
   };
 
@@ -101,6 +113,61 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({
           </div>
         </div>
 
+        {/* AI Learning Plan Card (Subtle AI Badge) */}
+        {report.learningPlan && (
+          <div className="p-5 sm:p-6 rounded-2xl bg-slate-50 border-2 border-slate-200/90 mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-950 text-[11px] font-black uppercase tracking-wider flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-amber-700" />
+                  <span>KIKI's AI Learning Plan</span>
+                </span>
+                <span className="text-xs text-slate-500 font-bold capitalize">
+                  {report.learningPlan.subjectCategory} • {report.learningPlan.appropriateDifficulty} Difficulty
+                </span>
+              </div>
+              <BookOpen className="w-4 h-4 text-slate-400" />
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-700 block mb-1">
+                  Pedagogical Objectives (Age {report.childAge}):
+                </span>
+                <ul className="space-y-1">
+                  {report.learningPlan.learningObjectives.map((obj, i) => (
+                    <li key={i} className="text-xs sm:text-sm text-slate-800 font-medium flex items-start gap-2">
+                      <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-900 font-bold text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5">
+                        {i + 1}
+                      </span>
+                      <span>{obj}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <strong className="text-slate-800">Age-Adapted Vocabulary:</strong>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {report.learningPlan.ageAppropriateVocabulary.map((v, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 font-bold text-[11px]">
+                        {v}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <strong className="text-slate-800">Likely Misconceptions Monitored:</strong>
+                  <p className="text-[11px] text-slate-600 mt-1 italic leading-relaxed">
+                    {report.learningPlan.likelyMisconceptions.join('; ')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Learning Goal vs Estimated Understanding */}
         <div className="p-5 sm:p-6 rounded-2xl bg-amber-50/60 border border-amber-200 mb-8">
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-900 mb-2">
@@ -130,25 +197,45 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({
           </p>
         </div>
 
-        {/* Adaptive Teaching Strategy (How KIKI Adapted) */}
-        {report.howKikiAdapted && (
-          <div className="p-5 sm:p-6 rounded-2xl bg-indigo-50/70 border border-indigo-200 mb-8">
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-indigo-900 mb-2">
-              <Sparkles className="w-4 h-4 text-indigo-600" />
-              <span>How KIKI Adapted to {report.childName}</span>
+        {/* Concept Understanding Profile (4 Dimensions) */}
+        {report.understandingProfile && report.understandingProfile.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Brain className="w-5 h-5 text-indigo-600" />
+              <h2 className="text-base sm:text-lg font-black text-slate-900">
+                Concept Understanding Profile
+              </h2>
             </div>
-            <p className="text-sm sm:text-base text-slate-800 font-medium leading-relaxed">
-              {report.howKikiAdapted}
-            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {report.understandingProfile.map((dim, idx) => (
+                <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-black text-slate-900">{dim.dimension}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${getRatingBadge(dim.rating)}`}>
+                      {dim.rating}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                    {dim.notes}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Section 1: Concepts Demonstrated with Direct Evidence */}
+        {/* Section 1: Concepts Demonstrated with Direct Evidence (Verbatim Excerpts) */}
         <div className="mb-8">
-          <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2 mb-4">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-            <span>Concepts Demonstrated (with Verbatim Evidence from Child)</span>
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <span>Concepts Demonstrated (with Understanding Evidence)</span>
+            </h2>
+            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+              ✨ Understanding Evidence
+            </span>
+          </div>
 
           <div className="space-y-3">
             {report.conceptsDemonstrated.map((item, idx) => (
@@ -168,13 +255,18 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({
           </div>
         </div>
 
-        {/* Section 2: Concepts Needing Reinforcement */}
+        {/* Section 2: Concepts Needing Reinforcement & AI-Identified Misconceptions */}
         {report.conceptsNeedingReinforcement && report.conceptsNeedingReinforcement.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2 mb-4">
-              <AlertCircle className="w-5 h-5 text-amber-600" />
-              <span>Areas for Gentle Reinforcement</span>
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-amber-600" />
+                <span>Areas for Gentle Reinforcement</span>
+              </h2>
+              <span className="text-[11px] font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full">
+                ✨ AI-Identified Misconception
+              </span>
+            </div>
 
             <div className="space-y-3">
               {report.conceptsNeedingReinforcement.map((item, idx) => (
@@ -194,22 +286,34 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({
           </div>
         )}
 
-        {/* Section 3: Cognitive & Learning Style Observations */}
-        {report.cognitiveObservations && report.cognitiveObservations.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2 mb-3">
-              <Sparkles className="w-5 h-5 text-sky-600" />
-              <span>Learning Behavior & Engagement Observations</span>
-            </h2>
+        {/* Adaptive Teaching Strategy (How KIKI Adapted) */}
+        {report.howKikiAdapted && (
+          <div className="p-5 sm:p-6 rounded-2xl bg-indigo-50/70 border border-indigo-200 mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-indigo-900">
+                <Sparkles className="w-4 h-4 text-indigo-600" />
+                <span>How KIKI Adapted to {report.childName}</span>
+              </div>
+              <span className="text-[11px] font-bold text-indigo-800 bg-indigo-100 px-2.5 py-0.5 rounded-full">
+                ✨ Adaptive Explanation
+              </span>
+            </div>
+            <p className="text-sm sm:text-base text-slate-800 font-medium leading-relaxed">
+              {report.howKikiAdapted}
+            </p>
+          </div>
+        )}
 
-            <ul className="space-y-2">
-              {report.cognitiveObservations.map((obs, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                  <span>{obs}</span>
-                </li>
-              ))}
-            </ul>
+        {/* Parent / Teacher Takeaway */}
+        {report.parentTeacherTakeaway && (
+          <div className="p-5 sm:p-6 rounded-2xl bg-amber-100/60 border border-amber-300 mb-8">
+            <div className="text-xs font-black uppercase tracking-wider text-amber-950 mb-1.5 flex items-center gap-2">
+              <span>🎓</span>
+              <span>Parent & Teacher Key Takeaway</span>
+            </div>
+            <p className="text-sm sm:text-base text-slate-900 font-semibold leading-relaxed">
+              {report.parentTeacherTakeaway}
+            </p>
           </div>
         )}
 

@@ -1,4 +1,4 @@
-import { AdventureSession, ParentSetup, StoryLevel } from '../types/quest';
+import { AdventureSession, ParentSetup, StoryLevel, LearningPlan } from '../types/quest';
 
 const SESSION_STORAGE_KEY = 'kiki_active_session';
 
@@ -23,10 +23,11 @@ export function loadActiveSession(): AdventureSession | null {
   }
 }
 
-export function createInitialSession(setup: ParentSetup, levels: StoryLevel[]): AdventureSession {
+export function createInitialSession(setup: ParentSetup, levels: StoryLevel[], plan?: LearningPlan): AdventureSession {
   return {
     id: `kiki-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
     setup,
+    learningPlan: plan,
     currentLevelIndex: 0,
     levels,
     currentChapterIndex: 0,

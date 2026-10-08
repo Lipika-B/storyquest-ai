@@ -1,9 +1,22 @@
-// KIKI Story Teacher Comprehensive Integration Test Suite
-// Verifies all 7 Section 30 Personas + Adaptive Scaffolding + Diagnostic Reporting
+// KIKI Story Teacher Comprehensive Integration & Educational Intelligence Test Suite
+// Verifies Section 14 Requirements:
+// - Age 6: Shadows
+// - Age 11: Digestion (showing academic depth vs age 6)
+// - Age 11: Fractions (inverse denominator relationship)
+// - Age 12: Force and Motion (inertia, net force, friction)
+// - Age 11: Photosynthesis (chloroplasts, glucose, autotrophic nutrition)
+// - Age 10: Online Privacy (credentials, PII, safety)
+// - Age 8: Hand Washing (20-second soap lathering)
+// - Custom: "How do airplanes fly?" (curved airfoils, pressure differential, Lift)
+// - Needs vs. Wants (strict domain isolation)
+// - Hiccups (diaphragm muscle reflex)
+// - Semantic Free-Text Evaluation & Misconception Diagnosis
+// - Adaptive Teaching Scaffolding with NEW question
+// - Evidence-Based Parent/Teacher Learning Report with Understanding Profile
 
 async function runTests() {
   const baseUrl = 'http://localhost:3000';
-  console.log('🧪 Starting KIKI Integration Verification Suite against', baseUrl);
+  console.log('🧪 Starting KIKI Educational Intelligence Verification Suite against', baseUrl);
 
   let passed = 0;
   let failed = 0;
@@ -20,382 +33,407 @@ async function runTests() {
 
   try {
     // -------------------------------------------------------------
-    // 1. PERSONA A: MATHS (Age 9, Multiplication 7x6 equal groups, Space, Robot, Rockets)
+    // 1. AGE 6: SHADOWS (Concrete, Short Sentences, Light Blocked)
     // -------------------------------------------------------------
-    console.log('\n--- 1. Testing Persona A: Maths (Multiplication 7x6, Space, Robot, Rockets) ---');
-    const resA = await fetch(`${baseUrl}/api/story/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        setup: {
-          childName: 'Alex',
-          childAge: 9,
-          topic: 'Multiplication (The 7 Times Table)',
-          learningGoal: 'Understand 7 × 6 as equal groups',
-          struggle: 'Confuses 7 × 6 and 7 × 7',
-          storyWorld: 'space',
-          companionType: 'robot',
-          interest: 'rockets and fuel crystals',
-          learningStyle: 'adventure'
-        }
-      })
-    });
-    const dataA = await resA.json();
-    const levelsA = dataA.levels || dataA.chapters || [];
-    assert(resA.status === 200, 'Persona A returns status 200');
-    assert(levelsA.length === 5, 'Persona A generates 5 adventure levels');
-    const textA = JSON.stringify(levelsA).toLowerCase();
-    assert(textA.includes('robot') || textA.includes('bolt'), 'Persona A features robot companion');
-    assert(textA.includes('rocket') || textA.includes('crystal') || textA.includes('fuel'), 'Persona A features rocket fuel crystals');
-    assert(textA.includes('7 × 6') || textA.includes('42') || textA.includes('equal groups'), 'Persona A addresses 7x6 equal groups');
-
-    // -------------------------------------------------------------
-    // 2. PERSONA B: SCIENCE (Age 8, Digestion, Monkey, Forest, Banana)
-    // -------------------------------------------------------------
-    console.log('\n--- 2. Testing Persona B: Science (Digestion, Monkey, Forest, Banana) ---');
-    const resB = await fetch(`${baseUrl}/api/story/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        setup: {
-          childName: 'Milo',
-          childAge: 8,
-          topic: 'How Digestion Works',
-          learningGoal: 'Stomach breaks food into tiny nutrients for energy',
-          struggle: 'Thinks food stays in tummy like a backpack',
-          storyWorld: 'forest',
-          companionType: 'animal',
-          interest: 'monkeys and sweet bananas',
-          learningStyle: 'discovery'
-        }
-      })
-    });
-    const dataB = await resB.json();
-    const levelsB = dataB.levels || dataB.chapters || [];
-    assert(resB.status === 200, 'Persona B returns status 200');
-    assert(levelsB.length === 5, 'Persona B generates 5 adventure levels');
-    const textB = JSON.stringify(levelsB).toLowerCase();
-    assert(textB.includes('digest') || textB.includes('stomach') || textB.includes('tummy') || textB.includes('nutrient'), 'Persona B strictly teaches digestion (Topic Relevance preserved!)');
-    assert(!textB.includes('water cycle') && !textB.includes('ocean wave'), 'Persona B has NO water cycle hallucination');
-
-    // -------------------------------------------------------------
-    // 3. PERSONA C: CURIOSITY (Age 7, Shadows — Why does my shadow follow me?)
-    // -------------------------------------------------------------
-    console.log('\n--- 3. Testing Persona C: Curiosity (Shadows, Blocked Light) ---');
-    const resC = await fetch(`${baseUrl}/api/story/generate`, {
+    console.log('\n--- 1. Testing Age 6: Shadows (Light Blocked, Sensory Metaphors) ---');
+    const resShadows = await fetch(`${baseUrl}/api/story/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         setup: {
           childName: 'Emma',
-          childAge: 7,
-          topic: 'Why Shadows Form',
-          learningGoal: 'An opaque object blocks straight light beams, casting a dark shape',
-          struggle: 'Thinks shadows are real dark creatures following her',
-          storyWorld: 'everyday',
-          companionType: 'child',
-          interest: 'flashlights and bedtime adventures',
-          learningStyle: 'mystery'
-        }
-      })
-    });
-    const dataC = await resC.json();
-    const levelsC = dataC.levels || dataC.chapters || [];
-    assert(resC.status === 200, 'Persona C returns status 200');
-    assert(levelsC.length === 5, 'Persona C generates 5 adventure levels');
-    const textC = JSON.stringify(levelsC).toLowerCase();
-    assert(textC.includes('shadow') || textC.includes('light') || textC.includes('beam') || textC.includes('block'), 'Persona C teaches blocked light shadows');
-
-    // -------------------------------------------------------------
-    // 4. PERSONA D: CIVIC SENSE (Age 8, Keeping Public Places Clean)
-    // -------------------------------------------------------------
-    console.log('\n--- 4. Testing Persona D: Civic Sense (Keeping Public Places Clean, Monster) ---');
-    const resD = await fetch(`${baseUrl}/api/story/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        setup: {
-          childName: 'Aarav',
-          childAge: 8,
-          topic: 'Keeping Public Places Clean',
-          learningGoal: 'Shared parks belong to all citizens so trash must go in bins',
-          struggle: 'Drops snack wrappers on the park grass',
-          storyWorld: 'city',
-          companionType: 'monster',
-          interest: 'city playground slides',
-          learningStyle: 'rescue'
-        }
-      })
-    });
-    const dataD = await resD.json();
-    const levelsD = dataD.levels || dataD.chapters || [];
-    assert(resD.status === 200, 'Persona D returns status 200');
-    assert(levelsD.length === 5, 'Persona D generates 5 adventure levels');
-    const textD = JSON.stringify(levelsD).toLowerCase();
-    assert(textD.includes('park') || textD.includes('clean') || textD.includes('bin') || textD.includes('litter'), 'Persona D teaches public clean spaces');
-    assert(textD.includes('monster') || textD.includes('grumble'), 'Persona D features fuzzy monster companion');
-
-    // -------------------------------------------------------------
-    // 5. PERSONA E: SELF-CARE (Age 6, Hand Washing — Why 20 seconds of soap bubbles?)
-    // -------------------------------------------------------------
-    console.log('\n--- 5. Testing Persona E: Self-Care (Hand Washing, Soap Bubbles) ---');
-    const resE = await fetch(`${baseUrl}/api/story/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        setup: {
-          childName: 'Leo',
           childAge: 6,
-          topic: 'Why We Wash Hands with Soap',
-          learningGoal: 'Soap bubbles trap sticky germs and slide them down the drain in 20 seconds',
-          struggle: 'Rinses hands with water for only 2 seconds',
-          storyWorld: 'kitchen',
-          companionType: 'animal',
-          interest: 'playing with bubble baths',
-          learningStyle: 'discovery'
+          topic: 'Light and Shadows',
+          learningGoal: 'A solid object blocks straight light beams, casting a shadow',
+          struggle: 'Thinks shadows are separate creatures that follow you',
+          storyWorld: 'forest',
+          companionType: 'animal'
         }
       })
     });
-    const dataE = await resE.json();
-    const levelsE = dataE.levels || dataE.chapters || [];
-    assert(resE.status === 200, 'Persona E returns status 200');
-    assert(levelsE.length === 5, 'Persona E generates 5 adventure levels');
-    const textE = JSON.stringify(levelsE).toLowerCase();
-    assert(textE.includes('soap') || textE.includes('bubble') || textE.includes('germ') || textE.includes('wash'), 'Persona E teaches soap bubble hand washing');
+    const dataShadows = await resShadows.json();
+    assert(resShadows.status === 200, 'Age 6 Shadows returns status 200');
+    assert(dataShadows.levels && dataShadows.levels.length === 5, 'Generates 5 adventure levels');
+    assert(Boolean(dataShadows.learningPlan), 'Generates AI Learning Plan first');
+    assert(dataShadows.learningPlan.learningObjectives.length >= 3, 'Learning plan has >= 3 age-appropriate objectives');
+    const textShadows = JSON.stringify(dataShadows.levels).toLowerCase();
+    assert(textShadows.includes('shadow') && textShadows.includes('light'), 'Story strictly teaches shadows and light');
+    assert(textShadows.includes('block'), 'Teaches that solid objects block straight light beams');
 
     // -------------------------------------------------------------
-    // 6. PERSONA F: DIGITAL SAFETY (Age 10, Online Privacy & Strong Passwords)
+    // 2. AGE 11: DIGESTION (Mechanical & Chemical Breakdown, Absorption)
     // -------------------------------------------------------------
-    console.log('\n--- 6. Testing Persona F: Digital Safety (Online Privacy, Passwords) ---');
-    const resF = await fetch(`${baseUrl}/api/story/generate`, {
+    console.log('\n--- 2. Testing Age 11: Digestion (Cognitive Depth vs Age 6) ---');
+    const resDigestion11 = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Liam',
+          childAge: 11,
+          topic: 'How Digestion Works',
+          learningGoal: 'Mechanical and chemical processes break down food, absorbed in small intestine',
+          struggle: 'Thinks stomach absorbs all nutrients into the blood',
+          storyWorld: 'forest',
+          companionType: 'animal'
+        }
+      })
+    });
+    const dataDigestion11 = await resDigestion11.json();
+    assert(resDigestion11.status === 200, 'Age 11 Digestion returns status 200');
+    assert(dataDigestion11.learningPlan.targetAge === 11, 'Learning plan adapted for Age 11');
+    const planVocab = dataDigestion11.learningPlan.ageAppropriateVocabulary.join(' ').toLowerCase();
+    assert(planVocab.includes('enzymes') || planVocab.includes('absorption') || planVocab.includes('chyme') || planVocab.includes('intestine'), 'Age 11 Learning Plan contains academic vocabulary (enzymes, absorption, intestine)');
+    const textDigestion11 = JSON.stringify(dataDigestion11.levels).toLowerCase();
+    assert(textDigestion11.includes('mechanical') || textDigestion11.includes('chemical') || textDigestion11.includes('absorption') || textDigestion11.includes('intestine'), 'Age 11 narrative teaches mechanical/chemical processes and intestinal absorption');
+    assert(!textDigestion11.includes('water cycle') && !textDigestion11.includes('ocean wave'), 'Digestion has zero water cycle leakage');
+
+    // -------------------------------------------------------------
+    // 3. AGE 11: FRACTIONS (Comparing 1/3 vs 1/4 Slices, Inverse Denominator)
+    // -------------------------------------------------------------
+    console.log('\n--- 3. Testing Age 11: Fractions (Denominator Magnitude & Slicing) ---');
+    const resFractions = await fetch(`${baseUrl}/api/story/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         setup: {
           childName: 'Maya',
-          childAge: 10,
-          topic: 'Online Privacy & Passwords',
-          learningGoal: 'Never share personal secrets or passwords with online strangers',
-          struggle: 'Shares gaming passwords with casual friends',
-          storyWorld: 'cyber',
-          companionType: 'robot',
-          interest: 'coding video games',
-          learningStyle: 'adventure'
-        }
-      })
-    });
-    const dataF = await resF.json();
-    const levelsF = dataF.levels || dataF.chapters || [];
-    assert(resF.status === 200, 'Persona F returns status 200');
-    assert(levelsF.length === 5, 'Persona F generates 5 adventure levels');
-    const textF = JSON.stringify(levelsF).toLowerCase();
-    assert(textF.includes('privacy') || textF.includes('password') || textF.includes('secret') || textF.includes('lock'), 'Persona F teaches online privacy');
-
-    // -------------------------------------------------------------
-    // 7. PERSONA G: CUSTOM TOPIC (Age 11, "How do airplanes fly? Lift & Wing Shape")
-    // -------------------------------------------------------------
-    console.log('\n--- 7. Testing Persona G: Custom Topic (Airplanes, Lift & Wing Shape) ---');
-    const resG = await fetch(`${baseUrl}/api/story/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        setup: {
-          childName: 'Noah',
           childAge: 11,
-          topic: 'How Do Airplanes Fly?',
-          learningGoal: 'Curved airplane wings push air faster over top, creating lift',
-          struggle: 'Thinks engines alone flap or pull planes straight up like elevators',
-          storyWorld: 'custom',
-          companionType: 'magical',
-          interest: 'paper gliders and aviation',
-          learningStyle: 'adventure'
-        }
-      })
-    });
-    const dataG = await resG.json();
-    const levelsG = dataG.levels || dataG.chapters || [];
-    assert(resG.status === 200, 'Persona G returns status 200');
-    assert(levelsG.length === 5, 'Persona G generates 5 adventure levels');
-    const textG = JSON.stringify(levelsG).toLowerCase();
-    assert(textG.includes('wing') || textG.includes('lift') || textG.includes('air') || textG.includes('fly'), 'Persona G teaches aviation wing lift');
-
-    // -------------------------------------------------------------
-    // 7B. BUG FIX VERIFICATION: NEEDS VS. WANTS (Must NOT contain banana or digestion!)
-    // -------------------------------------------------------------
-    console.log('\n--- 7B. Testing Bug Fix: Needs vs. Wants (Must NOT feature bananas or digestion) ---');
-    const resNeeds = await fetch(`${baseUrl}/api/story/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        setup: {
-          childName: 'Sammy',
-          childAge: 9,
-          topic: 'Needs vs. Wants',
-          learningGoal: 'Understand that needs (food, water, warm clothes) come first, while wants (extra toys, treats) come after.',
-          struggle: 'Demands expensive toy sets at the grocery checkout thinking money is unlimited.',
-          storyWorld: 'kitchen',
-          companionType: 'child',
-          interest: 'market stalls and piggy banks'
-        }
-      })
-    });
-    const dataNeeds = await resNeeds.json();
-    const levelsNeeds = dataNeeds.levels || dataNeeds.chapters || [];
-    assert(resNeeds.status === 200, 'Needs vs Wants returns status 200');
-    assert(levelsNeeds.length === 5, 'Needs vs Wants generates 5 adventure levels');
-    const textNeeds = JSON.stringify(levelsNeeds).toLowerCase();
-    assert(textNeeds.includes('need') || textNeeds.includes('want') || textNeeds.includes('market') || textNeeds.includes('shopping'), 'Story teaches Needs vs Wants');
-    assert(!textNeeds.includes('swallow a whole banana') && !textNeeds.includes('where does the banana go'), 'CRITICAL FIX VERIFIED: Needs vs Wants contains NO banana or swallowing dialogue!');
-
-    // -------------------------------------------------------------
-    // 7C. CUSTOM TOPIC: HICCUPS (Diaphragm muscle reflex)
-    // -------------------------------------------------------------
-    console.log('\n--- 7C. Testing Custom Topic: Hiccups (Diaphragm muscle reflex) ---');
-    const resHic = await fetch(`${baseUrl}/api/story/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        setup: {
-          childName: 'Toby',
-          childAge: 7,
-          topic: 'Why Do We Get Hiccups?',
-          learningGoal: 'The diaphragm muscle underneath lungs spasms and snaps vocal cords shut',
-          storyWorld: 'custom',
-          companionType: 'animal'
-        }
-      })
-    });
-    const dataHic = await resHic.json();
-    const levelsHic = dataHic.levels || dataHic.chapters || [];
-    assert(resHic.status === 200, 'Hiccups returns status 200');
-    assert(levelsHic.length === 5, 'Hiccups generates 5 adventure levels');
-    const textHic = JSON.stringify(levelsHic).toLowerCase();
-    assert(textHic.includes('hiccup') || textHic.includes('diaphragm') || textHic.includes('breath'), 'Story teaches diaphragm reflex');
-
-    // -------------------------------------------------------------
-    // 8. UNDERSTANDING CHECK: "Explain it in your own words" (Semantic evaluation)
-    // -------------------------------------------------------------
-    console.log('\n--- 8. Testing /api/story/evaluate ("Explain it in your own words") ---');
-    const evalRes1 = await fetch(`${baseUrl}/api/story/evaluate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        promptText: 'Explain to KIKI how 7 × 6 works!',
-        childResponse: 'becuz 7 trays with 6 crystals each is equal groups and 5 was 35 so add 7 is 42',
-        expectedCoreConcept: 'Understand that 7 × 6 means 7 equal groups of 6, and build from 7 × 5 = 35',
-        childAge: 9,
-        checkpointType: 'own_words'
-      })
-    });
-    const evalData1 = await evalRes1.json();
-    assert(evalRes1.status === 200, 'Evaluate endpoint returns status 200');
-    assert(evalData1.understood === true, 'Child understood concept despite conversational punctuation & spelling');
-    assert(evalData1.nextAction === 'advance', 'Next action is advance');
-
-    // -------------------------------------------------------------
-    // 9. ADAPTIVE SCAFFOLDING: "Try Again, Differently"
-    // -------------------------------------------------------------
-    console.log('\n--- 9. Testing Adaptive Scaffolding When Child Hesitates ---');
-    const evalRes2 = await fetch(`${baseUrl}/api/story/evaluate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        promptText: 'Explain why 1/3 of a pizza is bigger than 1/4 of a pizza',
-        childResponse: '4 is bigger so 1/4 is bigger',
-        expectedCoreConcept: 'Dividing into more slices shrinks the size of each slice (inverse denominator)',
-        childAge: 11,
-        checkpointType: 'own_words'
-      })
-    });
-    const evalData2 = await evalRes2.json();
-    assert(evalData2.understood === false, 'Detected misconception correctly');
-    assert(evalData2.nextAction === 'try_differently', 'Next action is try_differently');
-    assert(!evalData2.friendlyFeedback.toLowerCase().includes('wrong'), 'KIKI never says "Wrong"');
-
-    const adaptRes = await fetch(`${baseUrl}/api/story/adapt`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        question: 'Explain why 1/3 is bigger than 1/4',
-        childResponse: '4 is bigger so 1/4 is bigger',
-        expectedConcept: 'Dividing into more slices shrinks each slice',
-        misconception: evalData2.misconceptionIdentified,
-        setup: {
-          childName: 'Devon',
-          childAge: 11,
-          topic: 'Fractions',
-          learningGoal: 'Dividing into more slices shrinks each slice',
-          interest: 'pizza baking',
+          topic: 'Comparing Fractions (1/3 vs 1/4)',
+          learningGoal: 'Dividing into more equal pieces makes each individual piece smaller (1/3 > 1/4)',
+          struggle: 'Thinks 1/4 is bigger than 1/3 because 4 is greater than 3',
           storyWorld: 'kitchen',
           companionType: 'child'
         }
       })
     });
-    const adaptData = await adaptRes.json();
-    assert(adaptRes.status === 200, 'Adapt endpoint returns status 200');
-    assert(Boolean(adaptData.alternateAnalogy), 'Provides alternate tangible analogy');
-    assert(Boolean(adaptData.followUpPrompt), 'Provides follow-up scaffolded mini-challenge');
+    const dataFractions = await resFractions.json();
+    assert(resFractions.status === 200, 'Age 11 Fractions returns status 200');
+    assert(dataFractions.levels.length === 5, 'Generates 5 fraction levels');
+    const textFractions = JSON.stringify(dataFractions.levels).toLowerCase();
+    assert(textFractions.includes('fraction') && (textFractions.includes('denominator') || textFractions.includes('slice')), 'Teaches fractions and denominator partitioning');
+    assert(textFractions.includes('1/3') || textFractions.includes('1/4') || textFractions.includes('smaller'), 'Addresses 1/3 vs 1/4 slice comparison');
 
     // -------------------------------------------------------------
-    // 10. EVIDENCE-BASED PARENT/TEACHER LEARNING REPORT
+    // 4. AGE 12: FORCE AND MOTION (Inertia, Net Force & Friction)
     // -------------------------------------------------------------
-    console.log('\n--- 10. Testing /api/story/report (Evidence-Based Learning Insights) ---');
-    const reportRes = await fetch(`${baseUrl}/api/story/report`, {
+    console.log('\n--- 4. Testing Age 12: Force and Motion (Inertia & Newton’s Laws) ---');
+    const resForce = await fetch(`${baseUrl}/api/story/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         setup: {
-          childName: 'Alex',
+          childName: 'Devon',
+          childAge: 12,
+          topic: 'Force and Motion',
+          learningGoal: 'Unbalanced net force causes acceleration; friction opposes motion; inertia sustains velocity in frictionless space',
+          struggle: 'Believes continuous pushing force is required just to maintain constant speed in vacuum',
+          storyWorld: 'space',
+          companionType: 'robot'
+        }
+      })
+    });
+    const dataForce = await resForce.json();
+    assert(resForce.status === 200, 'Age 12 Force and Motion returns status 200');
+    const textForce = JSON.stringify(dataForce.levels).toLowerCase();
+    assert(textForce.includes('friction') && (textForce.includes('inertia') || textForce.includes('constant speed') || textForce.includes('net force')), 'Teaches friction and inertia');
+
+    // -------------------------------------------------------------
+    // 5. AGE 11: PHOTOSYNTHESIS (Leaves as Solar Kitchens, Glucose & Oxygen)
+    // -------------------------------------------------------------
+    console.log('\n--- 5. Testing Age 11: Photosynthesis (Chloroplasts, Autotrophs) ---');
+    const resPhoto = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Aria',
+          childAge: 11,
+          topic: 'Photosynthesis',
+          learningGoal: 'Plants synthesize glucose from sunlight, water, and CO2, releasing oxygen',
+          struggle: 'Thinks plants eat soil and dirt like cereal',
+          storyWorld: 'forest',
+          companionType: 'animal'
+        }
+      })
+    });
+    const dataPhoto = await resPhoto.json();
+    assert(resPhoto.status === 200, 'Age 11 Photosynthesis returns status 200');
+    const textPhoto = JSON.stringify(dataPhoto.levels).toLowerCase();
+    assert(textPhoto.includes('sunlight') && (textPhoto.includes('glucose') || textPhoto.includes('sugar') || textPhoto.includes('chloroplast')), 'Teaches solar energy synthesis of glucose');
+    assert(textPhoto.includes('oxygen'), 'Teaches oxygen release');
+
+    // -------------------------------------------------------------
+    // 6. AGE 10: ONLINE PRIVACY (Digital Safety, Passwords & PII)
+    // -------------------------------------------------------------
+    console.log('\n--- 6. Testing Age 10: Online Privacy (Personal Info & Passwords) ---');
+    const resPrivacy = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Kai',
+          childAge: 10,
+          topic: 'Online Privacy & Passwords',
+          learningGoal: 'Never share passwords or real-world identifying info with online strangers',
+          storyWorld: 'cyber',
+          companionType: 'robot'
+        }
+      })
+    });
+    const dataPrivacy = await resPrivacy.json();
+    assert(resPrivacy.status === 200, 'Age 10 Online Privacy returns status 200');
+    const textPrivacy = JSON.stringify(dataPrivacy.levels).toLowerCase();
+    assert(textPrivacy.includes('password') && (textPrivacy.includes('stranger') || textPrivacy.includes('private')), 'Teaches secret passwords and protecting personal privacy');
+
+    // -------------------------------------------------------------
+    // 7. AGE 8: HAND WASHING (20 Seconds Soap Bubbles)
+    // -------------------------------------------------------------
+    console.log('\n--- 7. Testing Age 8: Hand Washing (20-Second Soap Lathering) ---');
+    const resWash = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Leo',
+          childAge: 8,
+          topic: '20-Second Soap Hand Washing',
+          learningGoal: 'Soap molecules attach to invisible germs and wash them away with 20 seconds of lathering',
+          storyWorld: 'school',
+          companionType: 'animal'
+        }
+      })
+    });
+    const dataWash = await resWash.json();
+    assert(resWash.status === 200, 'Age 8 Hand Washing returns status 200');
+    const textWash = JSON.stringify(dataWash.levels).toLowerCase();
+    assert(textWash.includes('soap') && (textWash.includes('germ') || textWash.includes('20 second')), 'Teaches soap bubbles and 20 seconds lathering');
+
+    // -------------------------------------------------------------
+    // 8. CUSTOM TOPIC: "How Do Airplanes Fly?" (Lift & Airfoil)
+    // -------------------------------------------------------------
+    console.log('\n--- 8. Testing Custom Topic: "How do airplanes fly?" (Airfoils & Lift) ---');
+    const resFlight = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Sam',
+          childAge: 10,
+          topic: 'How Do Airplanes Fly?',
+          learningGoal: 'Curved wings cause air to move faster over the top, generating upward Lift',
+          storyWorld: 'sky',
+          companionType: 'child'
+        }
+      })
+    });
+    const dataFlight = await resFlight.json();
+    assert(resFlight.status === 200, 'Custom Topic Flight returns status 200');
+    const textFlight = JSON.stringify(dataFlight.levels).toLowerCase();
+    assert(textFlight.includes('wing') && (textFlight.includes('lift') || textFlight.includes('airfoil')), 'Teaches curved wings and upward lift');
+
+    // -------------------------------------------------------------
+    // 9. BUG FIX: NEEDS VS WANTS (Zero Banana / Digestion Dialogue)
+    // -------------------------------------------------------------
+    console.log('\n--- 9. Testing Bug Fix: Needs vs Wants (Zero Banana / Digestion Content) ---');
+    const resNeeds = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Chloe',
           childAge: 9,
-          topic: 'Multiplication (The 7 Times Table)',
-          learningGoal: 'Understand 7 × 6 as equal groups',
-          struggle: 'Confuses 7 × 6 and 7 × 7'
+          topic: 'Needs vs. Wants',
+          learningGoal: 'Needs (healthy food, water, warm clothes) come before wants (toys, extra treats)',
+          storyWorld: 'city',
+          companionType: 'child'
+        }
+      })
+    });
+    const dataNeeds = await resNeeds.json();
+    assert(resNeeds.status === 200, 'Needs vs Wants returns status 200');
+    const textNeeds = JSON.stringify(dataNeeds.levels).toLowerCase();
+    assert(textNeeds.includes('need') && textNeeds.includes('want'), 'Story teaches Needs vs Wants');
+    assert(!textNeeds.includes('banana') && !textNeeds.includes('digestive juices') && !textNeeds.includes('esophagus'), 'ZERO banana or digestion contamination');
+
+    // -------------------------------------------------------------
+    // 10. CUSTOM TOPIC: HICCUPS (Diaphragm Muscle Reflex)
+    // -------------------------------------------------------------
+    console.log('\n--- 10. Testing Custom Topic: Hiccups (Diaphragm Spasm) ---');
+    const resHiccup = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Zack',
+          childAge: 8,
+          topic: 'Why Do We Hiccup?',
+          learningGoal: 'Diaphragm muscle spasms and snaps vocal cords shut; calm breathing resets it',
+          storyWorld: 'school',
+          companionType: 'animal'
+        }
+      })
+    });
+    const dataHiccup = await resHiccup.json();
+    assert(resHiccup.status === 200, 'Hiccups returns status 200');
+    const textHiccup = JSON.stringify(dataHiccup.levels).toLowerCase();
+    assert(textHiccup.includes('diaphragm') && (textHiccup.includes('muscle') || textHiccup.includes('spasm')), 'Teaches diaphragm muscle reflex');
+
+    // -------------------------------------------------------------
+    // 11. SEMANTIC EVALUATION: Typo Tolerant Free-Text Evaluation
+    // -------------------------------------------------------------
+    console.log('\n--- 11. Testing /api/story/evaluate (Semantic Typo & Phrasing Tolerance) ---');
+    const resEval1 = await fetch(`${baseUrl}/api/story/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        promptText: 'In your own words, explain how food gives us energy.',
+        childResponse: 'the stomack and salyva break food into tinny nutreints for body blood!!',
+        expectedCoreConcept: 'Stomach and digestive system break food into tiny nutrients for energy',
+        childAge: 10,
+        checkpointType: 'own_words'
+      })
+    });
+    const evalData1 = await resEval1.json();
+    assert(resEval1.status === 200, 'Evaluate endpoint returns status 200');
+    assert(evalData1.understood === true, 'Child understood concept despite phonetic spelling mistakes');
+    assert(evalData1.nextAction === 'advance', 'Next action is advance');
+
+    // -------------------------------------------------------------
+    // 12. SEMANTIC MISCONCEPTION DIAGNOSIS: Digestion vs Absorption
+    // -------------------------------------------------------------
+    console.log('\n--- 12. Testing /api/story/evaluate (Specific Misconception Diagnosis) ---');
+    const resEval2 = await fetch(`${baseUrl}/api/story/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        promptText: 'Explain how food gets into the blood.',
+        childResponse: 'the stomach takes the nutrients into the blood',
+        expectedCoreConcept: 'The small intestine absorbs nutrients into the blood after stomach breakdown',
+        childAge: 11,
+        checkpointType: 'own_words'
+      })
+    });
+    const evalData2 = await resEval2.json();
+    assert(resEval2.status === 200, 'Evaluate returned status 200');
+    assert(evalData2.understood === false, 'Detected misconception correctly (understood = false)');
+    assert(Boolean(evalData2.misconceptionIdentified), 'Diagnosed specific misconception hurdle');
+    assert(evalData2.nextAction === 'try_differently', 'Next action is try_differently');
+    assert(!evalData2.friendlyFeedback.toLowerCase().includes('wrong'), 'KIKI never says "Wrong"');
+
+    // -------------------------------------------------------------
+    // 13. ADAPTIVE TEACHING: Alternate Analogy + BRAND NEW Question
+    // -------------------------------------------------------------
+    console.log('\n--- 13. Testing /api/story/adapt (Alternate Analogy & Brand New Question) ---');
+    const resAdapt = await fetch(`${baseUrl}/api/story/adapt`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: 'Explain how food gets into the blood.',
+        childResponse: 'the stomach takes the nutrients into the blood',
+        expectedConcept: 'The small intestine absorbs nutrients into the blood after stomach breakdown',
+        misconception: evalData2.misconceptionIdentified,
+        setup: {
+          childName: 'Liam',
+          childAge: 11,
+          topic: 'How Digestion Works',
+          learningGoal: 'Small intestine absorbs nutrients into blood',
+          interest: 'sports and smoothies'
+        }
+      })
+    });
+    const adaptData = await resAdapt.json();
+    assert(resAdapt.status === 200, 'Adapt endpoint returns status 200');
+    assert(Boolean(adaptData.alternateAnalogy), 'Provides alternate tangible analogy');
+    assert(Boolean(adaptData.followUpPrompt), 'Provides a BRAND NEW follow-up prompt');
+    assert(adaptData.followUpPrompt !== 'Explain how food gets into the blood.', 'Follow-up question is NEW, not repeating the original question');
+    assert(Array.isArray(adaptData.options) && adaptData.options.length >= 2, 'Provides scaffolded multiple options');
+
+    // -------------------------------------------------------------
+    // 14. EVIDENCE-BASED PARENT/TEACHER LEARNING REPORT
+    // -------------------------------------------------------------
+    console.log('\n--- 14. Testing /api/story/report (Evidence-Based Learning Insights) ---');
+    const resReport = await fetch(`${baseUrl}/api/story/report`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Liam',
+          childAge: 11,
+          topic: 'How Digestion Works',
+          learningGoal: 'Understand mechanical breakdown and small intestine absorption',
         },
         interactions: [
           {
             levelNumber: 1,
-            question: 'How to arrange 7 rocket trays?',
+            phase: 'discover',
+            question: 'What happens to food?',
             childResponse: 'Let’s find out! 🚀',
-            attemptNumber: 1,
             demonstratedConcept: true,
-            positiveEvidence: ['Eagerly leaped into the discovery phase'],
+            positiveEvidence: ['Eager exploration'],
             scaffoldingUsed: false
           },
           {
             levelNumber: 2,
-            question: 'What pattern connects 7 rows of 5 and 7 rows of 6?',
-            childResponse: 'Add one more 7 to 35',
-            attemptNumber: 1,
+            phase: 'explore',
+            question: 'What happens first?',
+            childResponse: 'Teeth mechanically grind food while salivary enzymes begin breakdown',
             demonstratedConcept: true,
-            positiveEvidence: ['Recognized equal groups increment'],
+            positiveEvidence: ['Understood oral cavity action'],
             scaffoldingUsed: false
           },
           {
+            levelNumber: 3,
+            phase: 'solve',
+            question: 'How do stomach and intestine divide work?',
+            childResponse: 'The stomach takes the nutrients into the blood',
+            demonstratedConcept: false,
+            positiveEvidence: ['Thinking about nutrients in blood'],
+            misconceptionIdentified: 'Confused stomach churning with intestinal absorption',
+            scaffoldingUsed: true
+          },
+          {
             levelNumber: 4,
-            question: 'Teach KIKI how 7 × 6 works!',
-            childResponse: '7 trays of 6 crystals equals 42 fuel power',
-            attemptNumber: 1,
+            phase: 'teach',
+            question: 'Explain the digestive system',
+            childResponse: 'the stomack blenders food into soup then intestine absorbs it into blood',
             demonstratedConcept: true,
-            positiveEvidence: ['Demonstrated equal group multiplication in own words'],
+            positiveEvidence: ['Articulated blender vs sponge absorption'],
+            scaffoldingUsed: true
+          },
+          {
+            levelNumber: 5,
+            phase: 'master',
+            question: 'What happens if small intestine absorption is impaired?',
+            childResponse: 'Nutrients cannot enter capillaries to fuel cells because absorption occurs in small intestine',
+            demonstratedConcept: true,
+            positiveEvidence: ['Correctly applied intestinal absorption concept to fatigue'],
             scaffoldingUsed: false
           }
         ],
         starsEarned: 5
       })
     });
-    const reportData = await reportRes.json();
-    assert(reportRes.status === 200, 'Report endpoint returns status 200');
-    assert(Boolean(reportData.estimatedMastery), 'Includes estimated mastery rating');
-    assert(Array.isArray(reportData.conceptsDemonstrated) && reportData.conceptsDemonstrated.length > 0, 'Cites demonstrated concepts with evidence quotes');
-    assert(Boolean(reportData.howKikiAdapted), 'Explains how KIKI adapted to the child');
-    assert(Array.isArray(reportData.suggestedNextActivities) && reportData.suggestedNextActivities.length >= 2, 'Recommends real-world offline activities');
+    const reportData = await resReport.json();
+    assert(resReport.status === 200, 'Report endpoint returns status 200');
+    assert(Boolean(reportData.learningPlan), 'Report includes KIKI AI Learning Plan');
+    assert(Array.isArray(reportData.understandingProfile) && reportData.understandingProfile.length === 4, 'Report includes Understanding Profile across 4 dimensions');
+    assert(reportData.conceptsDemonstrated.length > 0, 'Report includes Demonstrated Concepts with evidence quotes');
+    const quotes = reportData.conceptsDemonstrated.map(d => d.evidenceQuote).join(' ');
+    assert(quotes.includes('stomack') || quotes.includes('blenders') || quotes.includes('Teeth'), 'Report includes verbatim quotes from the child');
+    assert(Boolean(reportData.howKikiAdapted), 'Report documents How KIKI Adapted to the child');
+    assert(Boolean(reportData.parentTeacherTakeaway), 'Report includes Parent/Teacher Key Takeaway summary');
+    assert(Array.isArray(reportData.suggestedNextActivities) && reportData.suggestedNextActivities.length >= 2, 'Report recommends offline real-world next activities');
 
-    console.log(`\n🎉 Verification Complete: ${passed} passed, ${failed} failed`);
+    // -------------------------------------------------------------
+    // FINAL SUMMARY
+    // -------------------------------------------------------------
+    console.log(`\n🎉 Educational Intelligence Verification Complete: ${passed} passed, ${failed} failed`);
     if (failed > 0) {
       process.exit(1);
     }
   } catch (err) {
-    console.error('Test execution error:', err);
+    console.error('Fatal test error:', err);
     process.exit(1);
   }
 }

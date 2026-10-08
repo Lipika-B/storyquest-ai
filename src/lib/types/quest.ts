@@ -28,11 +28,30 @@ export type LearningStyle =
   | 'discovery' 
   | 'rescue';
 
+export type SubjectCategory = 'mathematics' | 'science' | 'everyday' | 'custom';
+
+export interface LearningPlan {
+  topic: string;
+  subjectCategory: SubjectCategory;
+  targetAge: number;
+  ageBand: AgeBand;
+  learningObjectives: string[];
+  keyConcepts: string[];
+  prerequisiteKnowledge?: string[];
+  ageAppropriateVocabulary: string[];
+  likelyMisconceptions: string[];
+  appropriateDifficulty: 'introductory' | 'intermediate' | 'advanced';
+  realWorldConnection: string;
+  assessmentCriteria: string[];
+  generatedAt?: string;
+}
+
 export interface ParentSetup {
   childName: string;
   childAge: number;
   topic: string;
   learningGoal: string; // What the child should understand after the story
+  subjectCategory?: SubjectCategory;
   struggle?: string;    // What the child struggles with
   interest?: string;    // What the child enjoys
   storyWorld?: StoryWorld | string;
@@ -41,6 +60,15 @@ export interface ParentSetup {
 }
 
 export type LevelPhase = 'discover' | 'explore' | 'solve' | 'teach' | 'master';
+
+export type QuestionType = 
+  | 'recall' 
+  | 'why_reasoning' 
+  | 'application' 
+  | 'prediction' 
+  | 'misconception_check' 
+  | 'teach_back' 
+  | 'real_life_transfer';
 
 export type InteractionType = 'discover_tap' | 'choice' | 'prediction' | 'own_words' | 'master_choice';
 
@@ -65,10 +93,13 @@ export interface StoryLevel {
   shortNarration: string[]; // 1 to 3 short lines
   keyDiscoveryHook: string;
   interactionType: InteractionType;
+  questionType?: QuestionType;
   prompt: string;
   options?: string[]; // for choice, prediction, master
   expectedCoreConcept: string;
   scaffoldingHint: string;
+  targetObjective?: string;
+  ageDepthExplanation?: string;
 }
 
 export interface ChildInteraction {
@@ -88,8 +119,11 @@ export interface ChildInteraction {
 
 export interface EvaluationResult {
   understood: boolean;
+  conceptualGrasp?: 'solid' | 'partial' | 'hesitant';
   positiveElementsFound: string[];
   misconceptionIdentified?: string | null;
+  conceptUnderstoodExcerpt?: string;
+  conceptNeedingReinforcementExcerpt?: string;
   friendlyFeedback: string;
   nextAction: 'advance' | 'try_differently';
 }
@@ -103,6 +137,8 @@ export interface AdaptiveScaffolding {
   followUpPrompt: string;
   options?: string[];
   expectedConcept: string;
+  targetedMisconception?: string;
+  newQuestionType?: QuestionType;
 }
 
 export interface ReportDemonstratedConcept {
@@ -124,6 +160,12 @@ export interface NextLearningActivity {
   whyItHelps: string;
 }
 
+export interface UnderstandingDimension {
+  dimension: string;
+  rating: 'Beginning' | 'Developing' | 'Strong' | 'Mastered';
+  notes: string;
+}
+
 export interface LearningReport {
   id: string;
   topic: string;
@@ -131,13 +173,16 @@ export interface LearningReport {
   childName: string;
   childAge: number;
   ageBandLabel: string;
+  learningPlan?: LearningPlan;
   estimatedMastery: 'Beginning Exploration' | 'Developing Understanding' | 'Strong Understanding' | 'Mastered Concept';
   masterySummary: string;
+  understandingProfile?: UnderstandingDimension[];
   conceptsDemonstrated: ReportDemonstratedConcept[];
   conceptsNeedingReinforcement: ReportReinforcementConcept[];
   howKikiAdapted: string; // Explains teaching strategy & alternate analogies used
   cognitiveObservations: string[];
   suggestedNextActivities: NextLearningActivity[];
+  parentTeacherTakeaway?: string;
   totalStars: number;
   totalLevels: number;
   createdAt: string;
@@ -146,6 +191,7 @@ export interface LearningReport {
 export interface AdventureSession {
   id: string;
   setup: ParentSetup;
+  learningPlan?: LearningPlan;
   currentLevelIndex: number; // 0 to 4
   levels: StoryLevel[];
   currentChapterIndex?: number; // compatibility alias

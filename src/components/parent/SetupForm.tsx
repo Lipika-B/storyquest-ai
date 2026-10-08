@@ -139,6 +139,15 @@ export const SetupForm: React.FC<SetupFormProps> = ({
               <span>Age 9 (Curious)</span>
               <span>Age 13 (Master Sleuth)</span>
             </div>
+            <div className="mt-2 p-2.5 rounded-xl bg-amber-50/70 border border-amber-200/80 text-[11px] text-amber-950 font-medium">
+              {setup.childAge <= 7 ? (
+                <span>🌱 <strong>Ages 5–7 Focus:</strong> Short sentences, concrete sensory examples, personified companions, visual hands-on interactions.</span>
+              ) : setup.childAge <= 10 ? (
+                <span>🔍 <strong>Ages 8–10 Focus:</strong> Cause-and-effect reasoning, subject terminology, prediction challenges, multi-step actions.</span>
+              ) : (
+                <span>🚀 <strong>Ages 11–13 Focus:</strong> Academic vocabulary, underlying causal mechanisms, system variables, independent explanation.</span>
+              )}
+            </div>
           </div>
         </div>
 

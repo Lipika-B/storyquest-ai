@@ -18,7 +18,7 @@ import { TopicPreset, TOPIC_LIBRARY } from '@/lib/data/topicLibrary';
 import { createInitialSession, saveActiveSession, loadActiveSession, clearActiveSession } from '@/lib/utils/session';
 import { playSuccessChime, playEncouragementChime, playStarEarnedSound, setSoundEnabled, getSoundEnabled } from '@/lib/utils/audio';
 import { StorySpeaker } from '@/lib/utils/speech';
-import { generateParametricStory } from '@/lib/ai/storyEngine';
+import { generateParametricStory, generateLearningPlan } from '@/lib/ai/storyEngine';
 
 export default function Home() {
   // Requirement: Default to Child Home (🌈 KIKI's World), with Parent Studio accessible via top navbar
@@ -58,8 +58,9 @@ export default function Home() {
       setSession(saved);
       setSetup(saved.setup);
     } else {
-      const initialLevels = generateParametricStory(setup);
-      const initial = createInitialSession(setup, initialLevels);
+      const plan = generateLearningPlan(setup);
+      const initialLevels = generateParametricStory(setup, plan);
+      const initial = createInitialSession(setup, initialLevels, plan);
       initial.status = 'welcome'; // 🌈 KIKI's World is the entry experience
       setSession(initial);
     }
@@ -94,8 +95,9 @@ export default function Home() {
     setSetup(updatedSetup);
 
     // Prepare fresh adventure for this topic
-    const freshLevels = generateParametricStory(updatedSetup);
-    const newSession = createInitialSession(updatedSetup, freshLevels);
+    const plan = generateLearningPlan(updatedSetup);
+    const freshLevels = generateParametricStory(updatedSetup, plan);
+    const newSession = createInitialSession(updatedSetup, freshLevels, plan);
     newSession.status = 'intro';
     setSession(newSession);
     setReport(null);
@@ -114,9 +116,10 @@ export default function Home() {
     };
     setSetup(updatedSetup);
 
-    // Instant high-quality parametric 5-level adventure
-    const levels = generateParametricStory(updatedSetup);
-    const newSession = createInitialSession(updatedSetup, levels);
+    // Instant high-quality parametric 5-level adventure with AI learning plan
+    const plan = generateLearningPlan(updatedSetup);
+    const levels = generateParametricStory(updatedSetup, plan);
+    const newSession = createInitialSession(updatedSetup, levels, plan);
     newSession.status = 'intro'; // Transition into Cinematic Mini-Intro
     setSession(newSession);
     setReport(null);
@@ -131,7 +134,11 @@ export default function Home() {
       });
       const data = await res.json();
       if (data.levels && data.levels.length === 5) {
-        setSession(prev => prev ? { ...prev, levels: data.levels } : null);
+        setSession(prev => prev ? { 
+          ...prev, 
+          levels: data.levels, 
+          learningPlan: data.learningPlan || prev.learningPlan 
+        } : null);
       }
     } catch (e) {
       // Retain guaranteed parametric levels
@@ -149,9 +156,10 @@ export default function Home() {
     };
     setSetup(updatedSetup);
 
-    // Synthesize tailored adventure
-    const freshLevels = generateParametricStory(updatedSetup);
-    const newSession = createInitialSession(updatedSetup, freshLevels);
+    // Synthesize tailored adventure with learning plan
+    const plan = generateLearningPlan(updatedSetup);
+    const freshLevels = generateParametricStory(updatedSetup, plan);
+    const newSession = createInitialSession(updatedSetup, freshLevels, plan);
     newSession.status = 'intro';
     setSession(newSession);
     setReport(null);
@@ -165,7 +173,11 @@ export default function Home() {
       });
       const data = await res.json();
       if (data.levels && data.levels.length === 5) {
-        setSession(prev => prev ? { ...prev, levels: data.levels } : null);
+        setSession(prev => prev ? { 
+          ...prev, 
+          levels: data.levels, 
+          learningPlan: data.learningPlan || prev.learningPlan 
+        } : null);
       }
     } catch (e) {
       // Retain parametric levels
@@ -207,7 +219,8 @@ export default function Home() {
       const data = await res.json();
       const generatedLevels = data.levels || data.chapters || [];
       if (generatedLevels.length > 0) {
-        const newSession = createInitialSession(setup, generatedLevels);
+        const plan = data.learningPlan || generateLearningPlan(setup);
+        const newSession = createInitialSession(setup, generatedLevels, plan);
         newSession.status = 'intro';
         setSession(newSession);
         setReport(null);
@@ -216,8 +229,9 @@ export default function Home() {
     } catch (err) {
       console.error('Failed to generate story:', err);
       // Fallback to local parametric generation
-      const freshLevels = generateParametricStory(setup);
-      const newSession = createInitialSession(setup, freshLevels);
+      const plan = generateLearningPlan(setup);
+      const freshLevels = generateParametricStory(setup, plan);
+      const newSession = createInitialSession(setup, freshLevels, plan);
       newSession.status = 'intro';
       setSession(newSession);
       setCurrentPortal('child');
@@ -286,6 +300,7 @@ export default function Home() {
           childAge: session.setup.childAge,
           checkpointType: currentLevel.interactionType,
           options: currentLevel.options,
+          learningPlan: session.learningPlan,
         }),
       });
 
@@ -333,6 +348,7 @@ export default function Home() {
             expectedConcept: currentLevel.expectedCoreConcept,
             misconception: evalResult.misconceptionIdentified,
             setup: session.setup,
+            learningPlan: session.learningPlan,
             checkpointId: `level-${currentLevel.levelNumber}`,
           }),
         });
@@ -436,6 +452,7 @@ export default function Home() {
             setup: completedSession.setup,
             interactions: completedSession.interactions,
             starsEarned: completedSession.starsEarned,
+            learningPlan: completedSession.learningPlan,
           }),
         });
         const rep = await res.json();
@@ -462,6 +479,7 @@ export default function Home() {
           setup: session.setup,
           interactions: session.interactions,
           starsEarned: session.starsEarned,
+          learningPlan: session.learningPlan,
         }),
       });
       const rep = await res.json();
