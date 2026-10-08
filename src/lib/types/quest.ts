@@ -28,7 +28,7 @@ export type LearningStyle =
   | 'discovery' 
   | 'rescue';
 
-export type SubjectCategory = 'mathematics' | 'science' | 'everyday' | 'custom';
+export type SubjectCategory = 'mathematics' | 'science' | 'social' | 'everyday' | 'custom';
 
 export interface LearningPlan {
   topic: string;
@@ -96,6 +96,7 @@ export interface StoryLevel {
   questionType?: QuestionType;
   prompt: string;
   options?: string[]; // for choice, prediction, master
+  correctOption?: string; // target correct option to prevent option [0] bias
   expectedCoreConcept: string;
   scaffoldingHint: string;
   targetObjective?: string;
@@ -136,6 +137,7 @@ export interface AdaptiveScaffolding {
   realWorldConnection: string;
   followUpPrompt: string;
   options?: string[];
+  correctOption?: string;
   expectedConcept: string;
   targetedMisconception?: string;
   newQuestionType?: QuestionType;

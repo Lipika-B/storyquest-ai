@@ -300,6 +300,7 @@ export default function Home() {
           childAge: session.setup.childAge,
           checkpointType: currentLevel.interactionType,
           options: currentLevel.options,
+          correctOption: currentLevel.correctOption,
           learningPlan: session.learningPlan,
         }),
       });

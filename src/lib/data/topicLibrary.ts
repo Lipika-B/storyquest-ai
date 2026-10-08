@@ -1,7 +1,7 @@
 export interface TopicPreset {
   id: string;
   topic: string;
-  category: 'mathematics' | 'science' | 'everyday';
+  category: 'mathematics' | 'science' | 'social' | 'everyday';
   learningGoal: string;
   defaultStruggle?: string;
   suggestedAge: number;
@@ -69,6 +69,19 @@ export const TOPIC_LIBRARY: TopicCategory[] = [
         world: 'forest',
         companion: 'animal',
         interest: 'collecting golden acorns in baskets',
+        learningStyle: 'discovery'
+      },
+      {
+        id: 'math-shapes-counting',
+        topic: 'Star Counting & Shapes (Circles, Triangles & Rectangles)',
+        category: 'mathematics',
+        subtopic: 'Early Geometry & Counting',
+        learningGoal: 'Identify geometric shapes by their sides and corners: triangles have 3 corners, rectangles/squares have 4 corners, and circles are round with 0 corners.',
+        defaultStruggle: 'Confuses triangles with squares or counts the same corner twice.',
+        suggestedAge: 6,
+        world: 'space',
+        companion: 'robot',
+        interest: 'twinkling constellations, building blocks, and treehouses',
         learningStyle: 'discovery'
       },
       {
@@ -199,6 +212,32 @@ export const TOPIC_LIBRARY: TopicCategory[] = [
         world: 'forest',
         companion: 'animal',
         interest: 'flashlights and silly shadow puppets',
+        learningStyle: 'discovery'
+      },
+      {
+        id: 'sci-colours-mixing',
+        topic: 'Rainbow Garden (Colours & Primary Mixing)',
+        category: 'science',
+        subtopic: 'Light & Color Theory',
+        learningGoal: 'Discover that Red, Blue, and Yellow are pure primary colors that combine into secondary colors: Blue + Yellow = Green, Red + Yellow = Orange, Red + Blue = Purple.',
+        defaultStruggle: 'Confuses which primary colors mix together or thinks white and black are primary mixing pigments.',
+        suggestedAge: 6,
+        world: 'forest',
+        companion: 'animal',
+        interest: 'finger painting, rainbows, and garden flowers',
+        learningStyle: 'discovery'
+      },
+      {
+        id: 'sci-animal-habitats',
+        topic: 'Animal Habitats & Adaptations (Camels, Polar Bears & Camouflage)',
+        category: 'science',
+        subtopic: 'Animal Biology & Habitats',
+        learningGoal: 'Understand that animals have specialized body adaptations suited to survive in their unique habitats, such as camel humps in deserts and white camouflage fur in the arctic.',
+        defaultStruggle: 'Assumes animals can live anywhere without special body adaptations.',
+        suggestedAge: 7,
+        world: 'forest',
+        companion: 'animal',
+        interest: 'zoo animals, wildlife trackers, and nature reserves',
         learningStyle: 'discovery'
       },
       {
@@ -395,6 +434,71 @@ export const TOPIC_LIBRARY: TopicCategory[] = [
         companion: 'monster',
         interest: 'block towers and rainy day board games',
         learningStyle: 'real-life'
+      }
+    ]
+  },
+
+  // ==========================================
+  // 4. SOCIAL STUDIES & WORLD PASSPORT
+  // ==========================================
+  {
+    id: 'social',
+    name: 'Social Studies & World',
+    emoji: '🌍',
+    worldName: 'World Passport & Community Hub',
+    description: 'Explore world geography, countries & capitals, historical inventions, maps, and community civics.',
+    topics: [
+      {
+        id: 'soc-countries-capitals',
+        topic: 'KIKI World Passport (Countries & Capitals)',
+        category: 'social',
+        subtopic: 'World Geography',
+        learningGoal: 'Understand that countries have a special capital city where government leaders work, such as New Delhi in India, Paris in France, Tokyo in Japan, and Nairobi in Kenya.',
+        defaultStruggle: 'Assumes all cities in a country are capitals or confuses the capital with the largest city.',
+        suggestedAge: 8,
+        world: 'city',
+        companion: 'child',
+        interest: 'airplanes, world stamps, and adventure flags',
+        learningStyle: 'adventure'
+      },
+      {
+        id: 'soc-maps-continents',
+        topic: 'Maps & Continents (Oceans, Hemispheres & Compasses)',
+        category: 'social',
+        subtopic: 'Cartography',
+        learningGoal: 'Understand how compass directions (North, South, East, West) and continents divide our round globe.',
+        defaultStruggle: 'Thinks the top of a map is always where the sun rises.',
+        suggestedAge: 7,
+        world: 'ocean',
+        companion: 'magical',
+        interest: 'pirate treasure maps and compasses',
+        learningStyle: 'discovery'
+      },
+      {
+        id: 'soc-community-helpers',
+        topic: 'Community Helpers (Firefighters, Doctors & Teamwork)',
+        category: 'social',
+        subtopic: 'Civics & Community',
+        learningGoal: 'Understand how different community helpers collaborate to keep towns safe, healthy, and thriving.',
+        defaultStruggle: 'Thinks one person does every job in a city.',
+        suggestedAge: 6,
+        world: 'city',
+        companion: 'animal',
+        interest: 'fire trucks, doctor stethoscopes, and building blocks',
+        learningStyle: 'adventure'
+      },
+      {
+        id: 'soc-history-inventions',
+        topic: 'History & Inventions (How the Wheel Changed the World)',
+        category: 'social',
+        subtopic: 'History & Technology',
+        learningGoal: 'Understand how historical human inventions like wheels, writing, and electric light transformed daily life.',
+        defaultStruggle: 'Assumes humans always had cars, smartphones, and electricity.',
+        suggestedAge: 9,
+        world: 'village',
+        companion: 'robot',
+        interest: 'ancient castles, steam trains, and clocks',
+        learningStyle: 'discovery'
       }
     ]
   }

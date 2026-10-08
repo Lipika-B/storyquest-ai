@@ -426,6 +426,177 @@ async function runTests() {
     assert(Array.isArray(reportData.suggestedNextActivities) && reportData.suggestedNextActivities.length >= 2, 'Report recommends offline real-world next activities');
 
     // -------------------------------------------------------------
+    // 14. MCQ ANSWER SHUFFLING & OPTION A BIAS ELIMINATION
+    // -------------------------------------------------------------
+    console.log('\n--- 14. Testing MCQ Choice Shuffling & Option A Bias Elimination ---');
+    const resMcq = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Alex',
+          childAge: 9,
+          topic: 'How Digestion Works',
+          learningGoal: 'Teeth chew food, stomach churns into chyme, small intestine absorbs nutrients',
+          storyWorld: 'forest',
+          companionType: 'animal'
+        }
+      })
+    });
+    const dataMcq = await resMcq.json();
+    assert(resMcq.status === 200, 'Adventure generated for MCQ test');
+    const choiceLevels = dataMcq.levels.filter(l => l.options && l.options.length > 1);
+    assert(choiceLevels.length >= 2, 'Adventure contains >= 2 multiple-choice levels');
+
+    // Verify correctOption is tracked and options are distributed
+    let foundNonZeroPosition = false;
+    for (const lvl of choiceLevels) {
+      assert(Boolean(lvl.correctOption), `Level ${lvl.levelNumber} has explicit correctOption tracked`);
+      assert(lvl.options.includes(lvl.correctOption), `Level ${lvl.levelNumber} options contain correctOption`);
+      const correctIdx = lvl.options.indexOf(lvl.correctOption);
+      if (correctIdx > 0) {
+        foundNonZeroPosition = true;
+      }
+    }
+    assert(foundNonZeroPosition, 'At least one level has correctOption at index > 0 (Option A bias eliminated!)');
+
+    // Test evaluation against correctOption at non-zero index
+    const testLevel = choiceLevels.find(l => l.options.indexOf(l.correctOption) > 0) || choiceLevels[0];
+    const correctIdx = testLevel.options.indexOf(testLevel.correctOption);
+    const wrongIdx = (correctIdx + 1) % testLevel.options.length;
+    const correctAns = testLevel.options[correctIdx];
+    const wrongAns = testLevel.options[wrongIdx];
+
+    // Submitting the true correctOption
+    const evalCorrectRes = await fetch(`${baseUrl}/api/story/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        promptText: testLevel.prompt,
+        childResponse: correctAns,
+        expectedCoreConcept: testLevel.expectedCoreConcept,
+        childAge: 9,
+        checkpointType: testLevel.interactionType,
+        options: testLevel.options,
+        correctOption: testLevel.correctOption,
+      })
+    });
+    const evalCorrectData = await evalCorrectRes.json();
+    assert(evalCorrectData.understood === true, `Submitting correctOption at index ${correctIdx} returns understood: true`);
+
+    // Submitting the distractor
+    const evalWrongRes = await fetch(`${baseUrl}/api/story/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        promptText: testLevel.prompt,
+        childResponse: wrongAns,
+        expectedCoreConcept: testLevel.expectedCoreConcept,
+        childAge: 9,
+        checkpointType: testLevel.interactionType,
+        options: testLevel.options,
+        correctOption: testLevel.correctOption,
+      })
+    });
+    const evalWrongData = await evalWrongRes.json();
+    assert(evalWrongData.understood === false, `Submitting distractor at index ${wrongIdx} returns understood: false`);
+
+    // -------------------------------------------------------------
+    // 15. SOCIAL STUDIES & WORLD PASSPORT (Countries & Capitals)
+    // -------------------------------------------------------------
+    console.log('\n--- 15. Testing KIKI World Passport: Countries & Capitals ---');
+    const resPassport = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Aarav',
+          childAge: 8,
+          topic: 'KIKI World Passport (Countries & Capitals)',
+          learningGoal: 'Understand countries have special capital cities like Paris in France and New Delhi in India',
+          storyWorld: 'city',
+          companionType: 'child'
+        }
+      })
+    });
+    const dataPassport = await resPassport.json();
+    assert(resPassport.status === 200, 'World Passport adventure generates successfully');
+    assert(dataPassport.learningPlan.subjectCategory === 'social', 'Assigned subject category "social"');
+    const passportText = JSON.stringify(dataPassport.levels).toLowerCase();
+    assert(passportText.includes('capital') && (passportText.includes('paris') || passportText.includes('delhi') || passportText.includes('tokyo') || passportText.includes('passport')), 'Story teaches countries and capital cities');
+
+    // -------------------------------------------------------------
+    // 16. RAINBOW GARDEN: COLOURS & PRIMARY MIXING (Younger Kids)
+    // -------------------------------------------------------------
+    console.log('\n--- 16. Testing Rainbow Garden: Colours & Primary Mixing ---');
+    const resColours = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Lily',
+          childAge: 6,
+          topic: 'Rainbow Garden (Colours & Primary Mixing)',
+          learningGoal: 'Red, Blue, and Yellow are primary colors; Blue + Yellow makes Green',
+          storyWorld: 'forest',
+          companionType: 'animal'
+        }
+      })
+    });
+    const dataColours = await resColours.json();
+    assert(resColours.status === 200, 'Rainbow Garden colours adventure generates successfully');
+    assert(dataColours.learningPlan.subjectCategory === 'science', 'Colours assigned subject category "science"');
+    const coloursText = JSON.stringify(dataColours.levels).toLowerCase();
+    assert(coloursText.includes('primary') && coloursText.includes('blue') && coloursText.includes('yellow') && coloursText.includes('green'), 'Story teaches primary colors mixing into green');
+
+    // -------------------------------------------------------------
+    // 17. ANIMAL HABITATS & ADAPTATIONS
+    // -------------------------------------------------------------
+    console.log('\n--- 17. Testing Animal Habitats & Adaptations ---');
+    const resHabitats = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Leo',
+          childAge: 7,
+          topic: 'Animal Habitats & Adaptations',
+          learningGoal: 'Camels have humps and padded feet for deserts; polar bears have white fur for arctic cold',
+          storyWorld: 'forest',
+          companionType: 'animal'
+        }
+      })
+    });
+    const dataHabitats = await resHabitats.json();
+    assert(resHabitats.status === 200, 'Animal Habitats adventure generates successfully');
+    const habitatsText = JSON.stringify(dataHabitats.levels).toLowerCase();
+    assert(habitatsText.includes('camel') && habitatsText.includes('polar bear') && habitatsText.includes('adaptation'), 'Story teaches desert camels and arctic polar bears');
+
+    // -------------------------------------------------------------
+    // 18. STAR COUNTING & SHAPES (Early Math)
+    // -------------------------------------------------------------
+    console.log('\n--- 18. Testing Star Counting & Shapes (Early Math) ---');
+    const resShapes = await fetch(`${baseUrl}/api/story/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setup: {
+          childName: 'Mia',
+          childAge: 6,
+          topic: 'Star Counting & Shapes (Circles, Triangles & Rectangles)',
+          learningGoal: 'Triangles have 3 corners, squares have 4 corners, and circles are round',
+          storyWorld: 'space',
+          companionType: 'robot'
+        }
+      })
+    });
+    const dataShapes = await resShapes.json();
+    assert(resShapes.status === 200, 'Star Counting & Shapes adventure generates successfully');
+    assert(dataShapes.learningPlan.subjectCategory === 'mathematics', 'Shapes assigned subject category "mathematics"');
+    const shapesText = JSON.stringify(dataShapes.levels).toLowerCase();
+    assert(shapesText.includes('triangle') && shapesText.includes('corner') && shapesText.includes('3'), 'Story teaches triangles having 3 corners');
+
+    // -------------------------------------------------------------
     // FINAL SUMMARY
     // -------------------------------------------------------------
     console.log(`\n🎉 Educational Intelligence Verification Complete: ${passed} passed, ${failed} failed`);

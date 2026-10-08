@@ -3,6 +3,7 @@ import { ParentSetup, StoryLevel, LearningPlan } from '@/lib/types/quest';
 import { callGeminiJSON } from '@/lib/ai/gemini';
 import { buildLearningPlanPrompt, buildStoryPrompt } from '@/lib/ai/prompts';
 import { generateLearningPlan, generateParametricStory } from '@/lib/ai/storyEngine';
+import { formatLevelChoices } from '@/lib/utils/quiz';
 
 interface GenerateResponse {
   levels: StoryLevel[];
@@ -50,9 +51,21 @@ export async function POST(req: NextRequest) {
       if (aiStory && Array.isArray(aiStory.levels) && aiStory.levels.length === 5) {
         const isRelevant = verifyTopicRelevance(setup.topic, aiStory.levels);
         if (isRelevant) {
+          const normalizedLevels = aiStory.levels.map((lvl, idx) => {
+            if (lvl.options && lvl.options.length > 0) {
+              const formatted = formatLevelChoices(lvl.options, idx);
+              return {
+                ...lvl,
+                options: formatted.options,
+                correctOption: lvl.correctOption || formatted.correctOption,
+              };
+            }
+            return lvl;
+          });
+
           return NextResponse.json({
             success: true,
-            levels: aiStory.levels,
+            levels: normalizedLevels,
             learningPlan,
             source: 'ai',
           });

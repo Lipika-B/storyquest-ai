@@ -58,6 +58,10 @@ export const PictureBookStage: React.FC<PictureBookStageProps> = ({
     else if (emoji === '💧') msg = 'Clean water washes the trapped germs right down the drain!';
     else if (emoji === '🔒' || emoji === '🛡️') msg = 'Padlocks keep your personal passwords safe!';
     else if (emoji === '😮' || emoji === '🫁') msg = 'The diaphragm muscle spasms and makes the *hic* sound!';
+    else if (emoji === '🌍' || emoji === '🗺️' || emoji === '🗼' || emoji === '🏛️') msg = 'Every country has a special headquarters capital city!';
+    else if (emoji === '🎨' || emoji === '🌈' || emoji === '🔴' || emoji === '🟡' || emoji === '🔵') msg = 'Primary paints (Red, Blue, Yellow) mix into green, orange, and purple!';
+    else if (emoji === '🐫' || emoji === '🐻‍❄️' || emoji === '🐾') msg = 'Animals have specialized body features suited to their habitat!';
+    else if (emoji === '🔺' || emoji === '🟦' || emoji === '⭐' || emoji === '3️⃣' || emoji === '4️⃣') msg = 'Count sides and sharp corners to recognize every geometric shape!';
     setTappedMsg(msg);
   };
 

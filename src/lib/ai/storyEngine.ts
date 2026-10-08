@@ -1,4 +1,5 @@
 import { ParentSetup, StoryLevel, SceneVisualDetails, LearningPlan, QuestionType } from '../types/quest';
+import { formatLevelChoices } from '../utils/quiz';
 
 interface CompanionDetails {
   name: string;
@@ -102,6 +103,8 @@ export function generateLearningPlan(setup: ParentSetup): LearningPlan {
     topicLower.includes('ratio') || 
     topicLower.includes('geometry') || 
     topicLower.includes('graph') ||
+    topicLower.includes('shape') ||
+    topicLower.includes('count') ||
     topicLower.includes('math')
   ) {
     category = 'mathematics';
@@ -120,9 +123,25 @@ export function generateLearningPlan(setup: ParentSetup): LearningPlan {
     topicLower.includes('matter') ||
     topicLower.includes('electric') ||
     topicLower.includes('ecosystem') ||
+    topicLower.includes('colour') ||
+    topicLower.includes('color') ||
+    topicLower.includes('rainbow') ||
+    topicLower.includes('animal') ||
+    topicLower.includes('habitat') ||
     topicLower.includes('space')
   ) {
     category = 'science';
+  } else if (
+    topicLower.includes('country') ||
+    topicLower.includes('capital') ||
+    topicLower.includes('passport') ||
+    topicLower.includes('geography') ||
+    topicLower.includes('map') ||
+    topicLower.includes('world') ||
+    topicLower.includes('flag') ||
+    topicLower.includes('history')
+  ) {
+    category = 'social';
   } else if (
     topicLower.includes('clean') || 
     topicLower.includes('privacy') || 
@@ -405,6 +424,98 @@ export function generateLearningPlan(setup: ParentSetup): LearningPlan {
       likelyMisconceptions: ['Engines push the plane straight up like rocket fireworks', 'Wings float like balloons without forward speed'],
       realWorldConnection: 'Sticking your hand out of a moving car window and tilting it upward to feel the wind lift your hand.',
       assessmentCriteria: ['Identifies curved wing shape (airfoil)', 'Explains fast air creates upward lift', 'Concludes forward speed is essential']
+    };
+  }
+
+  if (topicLower.includes('country') || topicLower.includes('capital') || topicLower.includes('passport') || topicLower.includes('geography')) {
+    return {
+      topic: setup.topic,
+      subjectCategory: 'social',
+      targetAge: age,
+      ageBand,
+      appropriateDifficulty: difficulty,
+      learningObjectives: [
+        'Understand that countries are distinct nations on Earth, each with a designated capital city.',
+        'Discover the function of a capital city as the national government headquarters.',
+        'Explore world landmarks, maps, and national flags.',
+        'Identify famous capital cities: New Delhi (India), Paris (France), Tokyo (Japan), Nairobi (Kenya).'
+      ],
+      keyConcepts: ['Nation / Country', 'Capital City headquarters', 'Government & laws', 'World Atlas & Maps'],
+      prerequisiteKnowledge: ['Knowing that the Earth is a round planet with many different places and people'],
+      ageAppropriateVocabulary: age <= 8 
+        ? ['country', 'capital city', 'world', 'map', 'flag', 'travel'] 
+        : ['sovereign nation', 'administrative capital', 'governance', 'cartography', 'diplomacy'],
+      likelyMisconceptions: ['Assuming all cities in a country are capitals or that countries change capitals every week'],
+      realWorldConnection: 'Looking at world atlas globes, airplane travel routes, and international sporting events like the Olympics.',
+      assessmentCriteria: ['Explains the role of a capital city', 'Matches major countries to their capitals', 'Interprets map star symbols']
+    };
+  }
+
+  if (topicLower.includes('colour') || topicLower.includes('color') || topicLower.includes('rainbow')) {
+    return {
+      topic: setup.topic,
+      subjectCategory: 'science',
+      targetAge: age,
+      ageBand,
+      appropriateDifficulty: difficulty,
+      learningObjectives: [
+        'Identify Red, Blue, and Yellow as primary colors that cannot be created by mixing other paints.',
+        'Understand that mixing two primary colors creates a secondary color.',
+        'Discover that Blue + Yellow = Green, Red + Yellow = Orange, and Red + Blue = Purple.',
+        'Apply color mixing to paint natural objects in the environment.'
+      ],
+      keyConcepts: ['Primary colors', 'Secondary colors', 'Color mixing rules (Blue+Yellow=Green, Red+Yellow=Orange)'],
+      prerequisiteKnowledge: ['Recognizing common colors like red, blue, green, and yellow'],
+      ageAppropriateVocabulary: ['primary colors', 'mix', 'palette', 'green', 'orange', 'purple', 'rainbow'],
+      likelyMisconceptions: ['Thinking black and white are primary mixing colors or that mixing is completely random'],
+      realWorldConnection: 'Painting pictures, seeing rainbows after rainstorms, and mixing food coloring in baking.',
+      assessmentCriteria: ['Identifies primary colors', 'States that Blue and Yellow make Green', 'Predicts Red and Yellow make Orange']
+    };
+  }
+
+  if (topicLower.includes('animal') || topicLower.includes('habitat')) {
+    return {
+      topic: setup.topic,
+      subjectCategory: 'science',
+      targetAge: age,
+      ageBand,
+      appropriateDifficulty: difficulty,
+      learningObjectives: [
+        'Understand that a habitat is the natural home where an animal finds food, water, and shelter.',
+        'Discover that animals have physical adaptations suited to their environment.',
+        'Explore how camels survive in deserts and polar bears survive in the arctic.',
+        'Understand how camouflage helps animals blend into their surroundings to stay safe.'
+      ],
+      keyConcepts: ['Habitat', 'Adaptation', 'Desert vs Arctic ecosystems', 'Camouflage'],
+      prerequisiteKnowledge: ['Animals live in different environments around the world'],
+      ageAppropriateVocabulary: age <= 8 
+        ? ['habitat', 'adaptation', 'camel hump', 'polar bear fur', 'camouflage', 'survive'] 
+        : ['ecosystem', 'physiological adaptation', 'insulation', 'camouflage', 'natural selection'],
+      likelyMisconceptions: ['Assuming animals choose their physical features or can survive in any climate without adaptations'],
+      realWorldConnection: 'Observing local birds, zoo exhibits, and nature wildlife documentaries.',
+      assessmentCriteria: ['Explains what a habitat is', 'Identifies camel and polar bear adaptations', 'Explains how camouflage protects animals']
+    };
+  }
+
+  if (topicLower.includes('shape') || topicLower.includes('triangle') || topicLower.includes('circle') || topicLower.includes('square')) {
+    return {
+      topic: setup.topic,
+      subjectCategory: 'mathematics',
+      targetAge: age,
+      ageBand,
+      appropriateDifficulty: difficulty,
+      learningObjectives: [
+        'Identify geometric shapes by their sides and vertices (corners).',
+        'Understand that triangles have 3 straight sides and 3 corners.',
+        'Differentiate 4-sided shapes (squares and rectangles) from triangles and circles.',
+        'Count equal items in groups and constellations.'
+      ],
+      keyConcepts: ['Sides & corners', 'Triangles (3)', 'Squares & Rectangles (4)', 'Circles (0 corners)'],
+      prerequisiteKnowledge: ['Counting to 10 and recognizing straight versus curved lines'],
+      ageAppropriateVocabulary: ['triangle', 'square', 'rectangle', 'circle', 'side', 'corner', 'count'],
+      likelyMisconceptions: ['Thinking orientation changes the shape (e.g. an upside down triangle is no longer a triangle)'],
+      realWorldConnection: 'Looking for shapes in house roofs, road signs, clock faces, and puzzle blocks.',
+      assessmentCriteria: ['Identifies triangles have 3 corners', 'Differentiates squares and circles', 'Counts sides accurately']
     };
   }
 
@@ -1473,6 +1584,310 @@ const TOPIC_BLUEPRINTS: TopicTemplate[] = [
         'Hiccups last forever and never stop'
       ]
     })
+  },
+
+  // 13. KIKI WORLD PASSPORT: COUNTRIES & CAPITALS
+  {
+    keywords: ['country', 'countries', 'capital', 'capitals', 'passport', 'geography', 'flag', 'world passport', 'delhi', 'paris', 'tokyo', 'nairobi'],
+    theme: 'city',
+    gradient: 'from-blue-900 via-indigo-900 to-slate-900',
+    defaultCompanion: 'child',
+    levelVisuals: [
+      ['🌍', '✈️', '🧭', '🗺️'],
+      ['🏛️', '🚩', '📜', '✨'],
+      ['🗼', '⛩️', '🦁', '🌟'],
+      ['💬', '👧', '💡', '🗺️'],
+      ['🌍', '🏆', '🎉', '🌟']
+    ],
+    l1Prompt: 'Let’s open KIKI’s World Passport! 🌍✈️',
+    l1Speech: (child, comp, age) => ({
+      kiki: age <= 7
+        ? `“Pack your bags, ${child}! KIKI’s World Passport is taking us across our round planet! Every country has a special city called its capital!”`
+        : `“Welcome to Global Cartography! Earth is home to nearly 200 sovereign nations, and each has one official capital city!”`,
+      companion: `“I have my passport stamped and ready! Why does every country have one special capital city?”`,
+      narration: [
+        `${child} and ${comp} unroll a giant colorful map of the continents and oceans.`,
+        `KIKI points to sparkling stars across the map: "These stars mark the capital cities of the world!"`
+      ]
+    }),
+    l2Prompt: (age) => age <= 7 ? 'What is a capital city in a country?' : 'What defines the constitutional role of a nation’s capital city?',
+    l2Speech: (comp, age) => ({
+      kiki: age <= 7
+        ? `“A capital is the country's special headquarters city where leaders meet to guide the nation!”`
+        : `“The capital is the primary administrative and diplomatic center where national government branches convene!”`,
+      companion: `“So while a country has many towns, the capital is where laws are signed and embassies meet!”`,
+      narration: [
+        `Countries can have huge bustling cities, but the capital is the official seat of governance.`,
+        `For example, New Delhi is the capital of India, Paris is the capital of France, and Tokyo is the capital of Japan!`
+      ],
+      options: [
+        'The special headquarters city where government leaders make laws and represent the nation',
+        'Any random town where someone had a picnic yesterday',
+        'A secret city that is hidden underwater where nobody lives'
+      ]
+    }),
+    l3Prompt: () => 'Which world capital city matches its country?',
+    l3Speech: () => ({
+      kiki: `“Look at our passport challenges! France has the Eiffel Tower in Paris, India has New Delhi, and Japan has Tokyo!”`,
+      companion: `“If we fly our adventure glider to France, which city is its famous capital?”`,
+      narration: [
+        `Stamps click into our passport with golden glitter!`,
+        `We match the country to its true capital city on the spinning globe!`
+      ],
+      options: [
+        'Paris is the capital of France, New Delhi is the capital of India, and Tokyo is the capital of Japan',
+        'The North Pole is the capital of every single country',
+        'Countries change their capital cities every ten minutes'
+      ]
+    }),
+    l4Prompt: () => 'In your own words, explain to KIKI: Why do countries have capital cities?',
+    l4Speech: () => ({
+      kiki: `“Can you tell me in your own words: Why does a nation designate one special city as its capital?”`,
+      companion: `“Teach me so I can give the world tour presentation to our school!”`,
+      narration: [
+        `KIKI takes out a sparkling globe, ready to listen to your reasoning.`,
+        `Explain the role of leaders, laws, and representing the whole country!`
+      ]
+    }),
+    l5Prompt: () => 'When reading a world atlas map, how are capital cities usually marked?',
+    l5Speech: () => ({
+      kiki: `“Master Geographer Triumph! How do mapmakers help travelers identify a country’s capital at a glance?”`,
+      companion: `“Mapmakers put a special star or circled dot next to the capital city name!”`,
+      narration: [
+        `A shower of gold passport stamps fills the adventure book!`,
+        `KIKI awards you the Master World Geographer Medal!`
+      ],
+      options: [
+        'Mapmakers mark capital cities with a special star (⭐) or circled dot on geographic maps',
+        'They erase the capital city name completely so nobody can find it',
+        'They turn the map upside down'
+      ]
+    })
+  },
+
+  // 14. RAINBOW GARDEN: COLOURS & PRIMARY MIXING (Younger Kids)
+  {
+    keywords: ['colour', 'color', 'rainbow', 'mixing', 'primary', 'palette', 'paint', 'green', 'orange', 'purple'],
+    theme: 'forest',
+    gradient: 'from-rose-100 via-amber-100 to-sky-100',
+    defaultCompanion: 'animal',
+    levelVisuals: [
+      ['🎨', '🌈', '🖌️', '✨'],
+      ['🔴', '🟡', '🔵', '💧'],
+      ['🟢', '🟠', '🟣', '🌿'],
+      ['💬', '🐒', '💡', '🎨'],
+      ['🌈', '🏆', '🎉', '🌟']
+    ],
+    l1Prompt: 'Let’s enter the Rainbow Garden! 🎨🌈',
+    l1Speech: (child, comp) => ({
+      kiki: `“Oh look! The flowers in Rainbow Garden need color! We have three magical primary paints: Red, Blue, and Yellow!”`,
+      companion: `“Ooh-ooh-aah! We need green paint for the grass and orange paint for the marigolds, but we only have 3 tubes!”`,
+      narration: [
+        `In Rainbow Garden, the paint easel holds three bright primary colors: Red, Blue, and Yellow.`,
+        `KIKI dips a paintbrush: "Primary colors are magic building blocks—mixing them creates brand new colors!"`
+      ]
+    }),
+    l2Prompt: () => 'What makes Red, Blue, and Yellow called PRIMARY colors?',
+    l2Speech: () => ({
+      kiki: `“Primary colors are pure and unique! You cannot make them by mixing other paints together.”`,
+      companion: `“Red, Blue, and Yellow are the parents of all other paint colors on our easel!”`,
+      narration: [
+        `Because primary colors cannot be created by mixing other pigments, they are the foundation.`,
+        `When you combine two primary colors, they blend into a secondary color!`
+      ],
+      options: [
+        'They are pure colors that cannot be made by mixing, and they combine to create all other colors',
+        'They are colors that only exist at midnight in outer space',
+        'They disappear when you put them on paper'
+      ]
+    }),
+    l3Prompt: () => 'Which two primary colors mix together to make Green for the tree leaves?',
+    l3Speech: (comp) => ({
+      kiki: `“Watch what happens on the palette! When cool Blue touches warm Yellow, what color springs to life?”`,
+      companion: `“Blue and Yellow mix into lush GREEN! And Red and Yellow make vibrant ORANGE!”`,
+      narration: [
+        `Swirling drops of Blue and Yellow paint blend together on the wooden palette.`,
+        `Fresh, vibrant emerald green emerges, and ${comp} paints the leafy trees!`
+      ],
+      options: [
+        'Blue and Yellow mix together to make Green (and Red + Yellow makes Orange)',
+        'Red and Black mix together to make Green',
+        'Colors cannot be mixed together at all'
+      ]
+    }),
+    l4Prompt: () => 'In your own words, explain to KIKI: How does color mixing work?',
+    l4Speech: () => ({
+      kiki: `“Can you tell me in your own words: How do primary colors like Blue, Yellow, and Red make new rainbow colors?”`,
+      companion: `“Teach me so I can paint my treehouse without running out of colors!”`,
+      narration: [
+        `KIKI holds up the paint palette, excited to hear your color mixing wisdom!`,
+        `Explain how primary colors blend into new shades!`
+      ]
+    }),
+    l5Prompt: () => 'If you want to paint a juicy ripe orange, which two primary colors will you mix?',
+    l5Speech: () => ({
+      kiki: `“Master Artist Challenge! Which two primary paints combine to make bright ORANGE?”`,
+      companion: `“Red like a strawberry and Yellow like sunshine mix into sweet Orange!”`,
+      narration: [
+        `The entire Rainbow Garden bursts into breathtaking, glowing colors!`,
+        `KIKI awards you the Master Colorist Painter Star!`
+      ],
+      options: [
+        'Red and Yellow mix together to create vibrant Orange',
+        'Blue and Blue make Orange',
+        'Brown and Purple make Orange'
+      ]
+    })
+  },
+
+  // 15. ANIMAL HABITATS & ADAPTATIONS (Younger Kids)
+  {
+    keywords: ['animal', 'habitat', 'camel', 'polar bear', 'adaptation', 'fur', 'woods', 'arctic', 'desert'],
+    theme: 'forest',
+    gradient: 'from-amber-100 via-sky-100 to-emerald-100',
+    defaultCompanion: 'animal',
+    levelVisuals: [
+      ['🐾', '🐫', '🐻‍❄️', '🌲'],
+      ['🏜️', '❄️', '🏝️', '🔍'],
+      ['🧥', '🐪', '🛡️', '⚡'],
+      ['💬', '🦊', '💡', '🐾'],
+      ['🐾', '🏆', '🌟', '🎉']
+    ],
+    l1Prompt: 'Let’s meet the animals in their natural homes! 🐾',
+    l1Speech: (child, comp) => ({
+      kiki: `“Look at all the incredible animals! An animal’s natural home is called its HABITAT!”`,
+      companion: `“Why does a polar bear live on freezing arctic ice, while a camel thrives in scorching desert sand?”`,
+      narration: [
+        `${child} and ${comp} explore different landscapes: frozen icebergs, sunny sandy dunes, and shady green forests.`,
+        `KIKI points out how each animal’s body is custom-built for its habitat!`
+      ]
+    }),
+    l2Prompt: () => 'What special superpowers help camels survive in hot, dry deserts?',
+    l2Speech: () => ({
+      kiki: `“Camels have wide padded feet so they don’t sink into sand, and humps that store fat for energy!”`,
+      companion: `“And they have long double eyelashes to keep desert sand out of their eyes during windstorms!”`,
+      narration: [
+        `A camel's body is adapted to survive days without water in scorching heat.`,
+        `These special physical features suited to a habitat are called ADAPTATIONS!`
+      ],
+      options: [
+        'Wide padded feet for sandy walking, humps storing energy fat, and long protective eyelashes',
+        'Fluffy ice skates and heavy wool coats',
+        'Camels carry water bottles in backpacks'
+      ]
+    }),
+    l3Prompt: () => 'Why do polar bears have thick fat and warm white fur in the arctic?',
+    l3Speech: () => ({
+      kiki: `“In the freezing arctic snow, what do polar bears need to stay warm and hunt?”`,
+      companion: `“Thick blubber fat traps body heat, and white fur provides camouflage in the snow!”`,
+      narration: [
+        `Without warm fur and insulating blubber, animals would freeze in sub-zero arctic temperatures.`,
+        `White fur also blends seamlessly into the snow so prey cannot spot them!`
+      ],
+      options: [
+        'Thick fat keeps them warm in freezing cold, and white fur camouflages them against the snow',
+        'They wear electric heating blankets underground',
+        'Polar bears like looking like giant marshmallows'
+      ]
+    }),
+    l4Prompt: () => 'In your own words, explain to KIKI: What is an animal adaptation?',
+    l4Speech: () => ({
+      kiki: `“Can you tell me in your own words: Why do animals have special bodies suited for their homes?”`,
+      companion: `“Teach me so I understand why forest monkeys have climbing tails!”`,
+      narration: [
+        `KIKI listens eagerly as you explain how animal bodies match their habitats.`,
+        `Explain how animal features help them survive and stay safe!`
+      ]
+    }),
+    l5Prompt: () => 'If a tree frog lives among bright green jungle leaves, how does its green skin help it survive?',
+    l5Speech: () => ({
+      kiki: `“Master Wildlife Challenge! How does green skin protect a tree frog in the leafy canopy?”`,
+      companion: `“Camouflage! Its green color blends in with leaves so predators fly right past without noticing!”`,
+      narration: [
+        `All the animals in Wonder Woods gather for a joyful celebration!`,
+        `KIKI awards you the Master Wildlife Biologist Badge!`
+      ],
+      options: [
+        'Green camouflage blends into leaves so predators cannot easily spot the frog',
+        'The green skin makes the frog glow like a neon flashlight at night',
+        'The frog turns into a wooden branch forever'
+      ]
+    })
+  },
+
+  // 16. STAR COUNTING & SHAPES (Early Math)
+  {
+    keywords: ['shape', 'shapes', 'triangle', 'circle', 'square', 'rectangle', 'corner', 'side', 'star counting'],
+    theme: 'space',
+    gradient: 'from-slate-950 via-indigo-900 to-amber-950',
+    defaultCompanion: 'robot',
+    levelVisuals: [
+      ['⭐', '🔺', '🟦', '🟡'],
+      ['3️⃣', '🔺', '4️⃣', '🟦'],
+      ['📐', '✨', '🏰', '🧩'],
+      ['💬', '🤖', '💡', '⭐'],
+      ['🌟', '🏆', '🎉', '🚀']
+    ],
+    l1Prompt: 'Let’s count shapes in the starry sky! ⭐🔺',
+    l1Speech: (child, comp) => ({
+      kiki: `“Look up at the glowing constellations, ${child}! Stars connect with straight lines to make geometric SHAPES!”`,
+      companion: `“BEEP-BOOP! My geometry sensor sees triangles, squares, and round circles in the sky!”`,
+      narration: [
+        `On the observation deck, glowing starlight traces shapes across the dark velvet sky.`,
+        `KIKI holds up geometric building blocks: "Every shape has a special rule for its sides and corners!"`
+      ]
+    }),
+    l2Prompt: () => 'What makes a TRIANGLE different from a SQUARE or RECTANGLE?',
+    l2Speech: () => ({
+      kiki: `“Count the sides and sharp corners! A triangle has exactly 3 sides and 3 corners!”`,
+      companion: `“While squares and rectangles have 4 sides and 4 corners, and circles are round with zero corners!”`,
+      narration: [
+        `A triangle always has three connected lines and three points.`,
+        `Squares have four equal sides, and circles curve around smoothly without any sharp corners!`
+      ],
+      options: [
+        'A triangle has 3 straight sides and 3 corners, while squares have 4 sides and 4 corners',
+        'A triangle is completely round with no corners',
+        'All shapes have one hundred corners'
+      ]
+    }),
+    l3Prompt: () => 'If KIKI is building a roof for a space treehouse, which shape has 3 corners to point upward?',
+    l3Speech: () => ({
+      kiki: `“We need a peaked roof that points up to the stars! Which shape has 3 sharp corners?”`,
+      companion: `“A triangle! Its three sides make a strong pointed roof that sheds stardust!”`,
+      narration: [
+        `The triangle roof locks into place atop the square treehouse room!`,
+        `Bolt the Robot beeps happily as the structure stands strong and steady!`
+      ],
+      options: [
+        'A triangle has 3 corners and forms a sturdy pointed roof',
+        'A round circle with no points',
+        'A squiggly line that has no sides'
+      ]
+    }),
+    l4Prompt: () => 'In your own words, explain to KIKI: How do you tell different shapes apart?',
+    l4Speech: () => ({
+      kiki: `“Can you tell me in your own words: How do you identify a triangle, a square, and a circle?”`,
+      companion: `“Teach me so my robot visual scanner never confuses shapes again!”`,
+      narration: [
+        `KIKI sits down with shape blocks, eager to hear your explanation!`,
+        `Explain how counting sides and corners helps you identify any shape!`
+      ]
+    }),
+    l5Prompt: () => 'If a shape has 4 straight sides of equal length and 4 square corners, what shape is it?',
+    l5Speech: () => ({
+      kiki: `“Master Shape Builder Puzzle! Four equal sides and four square corners make which shape?”`,
+      companion: `“A SQUARE! It’s the perfect balanced shape for treehouse walls and floor tiles!”`,
+      narration: [
+        `The star constellation flashes with dazzling rainbow light!`,
+        `KIKI awards you the Master Constellation Architect Trophy!`
+      ],
+      options: [
+        'A square (4 equal sides and 4 corners)',
+        'A triangle with 3 sides',
+        'A circle with no corners'
+      ]
+    })
   }
 ];
 
@@ -1525,6 +1940,9 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
     const l3 = b.l3Speech(companion.name, age);
     const l4 = b.l4Speech(companion.name, age);
     const l5 = b.l5Speech(companion.name, age);
+    const l2Choices = formatLevelChoices(l2.options, 1);
+    const l3Choices = formatLevelChoices(l3.options, 2);
+    const l5Choices = formatLevelChoices(l5.options, 4);
 
     return [
       {
@@ -1574,7 +1992,8 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
         interactionType: 'choice',
         questionType: 'prediction',
         prompt: b.l2Prompt(age),
-        options: l2.options,
+        options: l2Choices.options,
+        correctOption: l2Choices.correctOption,
         expectedCoreConcept: setup.learningGoal,
         scaffoldingHint: `Think about how the pieces fit together!`,
         targetObjective: plan.learningObjectives[1] || setup.learningGoal,
@@ -1601,7 +2020,8 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
         interactionType: 'choice',
         questionType: 'why_reasoning',
         prompt: b.l3Prompt(age),
-        options: l3.options,
+        options: l3Choices.options,
+        correctOption: l3Choices.correctOption,
         expectedCoreConcept: setup.learningGoal,
         scaffoldingHint: `Remember our core discovery!`,
         targetObjective: plan.learningObjectives[2] || setup.learningGoal,
@@ -1654,7 +2074,8 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
         interactionType: 'master_choice',
         questionType: 'real_life_transfer',
         prompt: b.l5Prompt(age),
-        options: l5.options,
+        options: l5Choices.options,
+        correctOption: l5Choices.correctOption,
         expectedCoreConcept: setup.learningGoal,
         scaffoldingHint: `You are the master of this discovery!`,
         targetObjective: plan.learningObjectives[4] || plan.learningObjectives[0],
@@ -1672,6 +2093,24 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
     : age <= 10 
       ? '“Let’s investigate how cause and effect work here!”' 
       : '“Let’s analyze the underlying scientific mechanism!”';
+
+  const fallbackL2 = formatLevelChoices([
+    `The core rule: ${setup.learningGoal}`,
+    `It changes completely randomly every second`,
+    `We should guess without checking how it works`
+  ], 1);
+
+  const fallbackL3 = formatLevelChoices([
+    `Apply the true mechanism: ${setup.learningGoal}`,
+    `Assume ${setup.struggle || 'an incorrect guess'} without testing`,
+    `Walk away from the puzzle entirely`
+  ], 2);
+
+  const fallbackL5 = formatLevelChoices([
+    `The same rule stays true everywhere because ${setup.learningGoal}`,
+    `It changes into something totally different tomorrow`,
+    `We must start over from zero every time`
+  ], 4);
 
   return [
     {
@@ -1727,11 +2166,8 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
       interactionType: 'choice',
       questionType: 'prediction',
       prompt: `Which idea explains how ${setup.topic} works?`,
-      options: [
-        `The core rule: ${setup.learningGoal}`,
-        `It changes completely randomly every second`,
-        `We should guess without checking how it works`
-      ],
+      options: fallbackL2.options,
+      correctOption: fallbackL2.correctOption,
       expectedCoreConcept: setup.learningGoal,
       scaffoldingHint: `Think about our learning goal: ${setup.learningGoal}!`,
       targetObjective: plan.learningObjectives[1] || setup.learningGoal,
@@ -1761,11 +2197,8 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
       interactionType: 'choice',
       questionType: 'why_reasoning',
       prompt: `How can ${child} solve the dilemma about ${setup.topic}?`,
-      options: [
-        `Apply the true mechanism: ${setup.learningGoal}`,
-        `Assume ${setup.struggle || 'an incorrect guess'} without testing`,
-        `Walk away from the puzzle entirely`
-      ],
+      options: fallbackL3.options,
+      correctOption: fallbackL3.correctOption,
       expectedCoreConcept: setup.learningGoal,
       scaffoldingHint: `Focus on the mechanism: ${setup.learningGoal}!`,
       targetObjective: plan.learningObjectives[2] || setup.learningGoal,
@@ -1824,11 +2257,8 @@ export function generateParametricStory(setup: ParentSetup, existingPlan?: Learn
       interactionType: 'master_choice',
       questionType: 'real_life_transfer',
       prompt: `Now that you understand ${setup.topic}, what will happen next time you see this in the real world?`,
-      options: [
-        `The same rule stays true everywhere because ${setup.learningGoal}`,
-        `It changes into something totally different tomorrow`,
-        `We must start over from zero every time`
-      ],
+      options: fallbackL5.options,
+      correctOption: fallbackL5.correctOption,
       expectedCoreConcept: `Consistent application of ${setup.learningGoal}`,
       scaffoldingHint: `The truth of ${setup.topic} stays true everywhere!`,
       targetObjective: plan.learningObjectives[0] || setup.learningGoal,

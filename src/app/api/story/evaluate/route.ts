@@ -6,7 +6,7 @@ import { buildEvaluationPrompt } from '@/lib/ai/prompts';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { promptText, childResponse, expectedCoreConcept, childAge, checkpointType, options, learningPlan } = body;
+    const { promptText, childResponse, expectedCoreConcept, childAge, checkpointType, options, correctOption, learningPlan } = body;
 
     if (!childResponse || !expectedCoreConcept) {
       return NextResponse.json(
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     // Handle multiple choice / prediction / master choice
     if (checkpointType === 'choice' || checkpointType === 'prediction' || checkpointType === 'master_choice') {
-      const isChoiceAccurate = evaluateChoiceAccuracy(childResponse, expectedCoreConcept, options);
+      const isChoiceAccurate = evaluateChoiceAccuracy(childResponse, expectedCoreConcept, correctOption, options);
       if (isChoiceAccurate) {
         return NextResponse.json<EvaluationResult>({
           understood: true,
@@ -72,11 +72,23 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function evaluateChoiceAccuracy(choice: string, expectedConcept: string, options?: string[]): boolean {
+function evaluateChoiceAccuracy(
+  choice: string,
+  expectedConcept: string,
+  correctOption?: string,
+  options?: string[]
+): boolean {
   const cleanChoice = choice.trim().toLowerCase();
   const cleanExpected = expectedConcept.toLowerCase();
 
-  // Keyword clues
+  // 1. Direct match with explicitly specified correctOption
+  if (correctOption) {
+    if (cleanChoice === correctOption.trim().toLowerCase()) {
+      return true;
+    }
+  }
+
+  // 2. Keyword and domain conceptual clues
   if (cleanChoice.includes('add') && cleanExpected.includes('add')) return true;
   if (cleanChoice.includes('sunshine') && cleanExpected.includes('sunlight')) return true;
   if (cleanChoice.includes('1/3') && cleanExpected.includes('1/3')) return true;
@@ -88,12 +100,22 @@ function evaluateChoiceAccuracy(choice: string, expectedConcept: string, options
   if (cleanChoice.includes('diaphragm') || cleanChoice.includes('spasm')) return true;
   if (cleanChoice.includes('essential needs first') || cleanChoice.includes('needs come first')) return true;
 
-  // By convention, the first option [0] is the scientifically formulated option in our blueprints
-  if (options && options.length > 0) {
-    if (choice === options[0]) {
-      return true;
-    }
-  }
+  // 3. Social Science, Countries & Capitals
+  if (cleanChoice.includes('new delhi') || cleanChoice.includes('paris') || cleanChoice.includes('tokyo') || cleanChoice.includes('nairobi') || cleanChoice.includes('canberra') || cleanChoice.includes('london')) return true;
+  if (cleanChoice.includes('capital') && cleanChoice.includes('government') || cleanChoice.includes('special city')) return true;
+
+  // 4. Colours & Mixing (Younger learners)
+  if (cleanChoice.includes('green') && (cleanExpected.includes('green') || cleanExpected.includes('blue and yellow') || cleanExpected.includes('colour') || cleanExpected.includes('color'))) return true;
+  if (cleanChoice.includes('orange') && (cleanExpected.includes('orange') || cleanExpected.includes('red and yellow'))) return true;
+  if (cleanChoice.includes('purple') && (cleanExpected.includes('purple') || cleanExpected.includes('red and blue'))) return true;
+
+  // 5. Animal Habitats & Shapes (Younger learners)
+  if (cleanChoice.includes('camel') && cleanChoice.includes('desert')) return true;
+  if (cleanChoice.includes('polar bear') && (cleanChoice.includes('snow') || cleanChoice.includes('arctic') || cleanChoice.includes('warmth'))) return true;
+  if (cleanChoice.includes('camouflage') || cleanChoice.includes('blends in')) return true;
+  if (cleanChoice.includes('triangle') && (cleanChoice.includes('3') || cleanChoice.includes('three'))) return true;
+  if (cleanChoice.includes('rectangle') || cleanChoice.includes('square')) return true;
+
   return false;
 }
 
@@ -115,6 +137,15 @@ function diagnoseChoiceMisconception(choice: string, expectedConcept: string): s
   }
   if (exp.includes('airplane') || exp.includes('lift')) {
     return 'Thought engines push upward like rockets rather than wings generating aerodynamic lift.';
+  }
+  if (exp.includes('capital') || exp.includes('country') || exp.includes('passport')) {
+    return 'Confused the capital city with an arbitrary city or assumed all cities are capitals.';
+  }
+  if (exp.includes('colour') || exp.includes('color') || exp.includes('rainbow')) {
+    return 'Confused primary color mixing combinations.';
+  }
+  if (exp.includes('animal') || exp.includes('habitat')) {
+    return 'Assumed animal body features are random rather than specialized adaptations to their habitat.';
   }
   return 'Selected an intuitive surface distractor rather than the underlying mechanism.';
 }
