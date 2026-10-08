@@ -130,6 +130,19 @@ export const LearningReportView: React.FC<LearningReportViewProps> = ({
           </p>
         </div>
 
+        {/* Adaptive Teaching Strategy (How KIKI Adapted) */}
+        {report.howKikiAdapted && (
+          <div className="p-5 sm:p-6 rounded-2xl bg-indigo-50/70 border border-indigo-200 mb-8">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-indigo-900 mb-2">
+              <Sparkles className="w-4 h-4 text-indigo-600" />
+              <span>How KIKI Adapted to {report.childName}</span>
+            </div>
+            <p className="text-sm sm:text-base text-slate-800 font-medium leading-relaxed">
+              {report.howKikiAdapted}
+            </p>
+          </div>
+        )}
+
         {/* Section 1: Concepts Demonstrated with Direct Evidence */}
         <div className="mb-8">
           <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2 mb-4">

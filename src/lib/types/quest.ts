@@ -34,42 +34,48 @@ export interface ParentSetup {
   topic: string;
   learningGoal: string; // What the child should understand after the story
   struggle?: string;    // What the child struggles with
-  interest?: string;    // What the child enjoys (animals, space, cooking, dinosaurs, etc.)
+  interest?: string;    // What the child enjoys
   storyWorld?: StoryWorld | string;
   companionType?: CompanionType | string;
   learningStyle?: LearningStyle | string;
 }
 
-export type CheckpointType = 'choice' | 'prediction' | 'own_words';
+export type LevelPhase = 'discover' | 'explore' | 'solve' | 'teach' | 'master';
 
-export interface Checkpoint {
-  id: string;
-  type: CheckpointType;
-  prompt: string;
+export type InteractionType = 'discover_tap' | 'choice' | 'prediction' | 'own_words' | 'master_choice';
+
+export interface SceneVisualDetails {
+  theme: 'space' | 'forest' | 'city' | 'kitchen' | 'school' | 'ocean' | 'cyber' | 'sky' | 'body' | 'everyday';
+  backdropGradient: string;
+  visualItems: string[]; // Emojis or SVG prop keys displayed in the picture scene
+  characterAction: string; // Brief description of what characters are doing in the picture
+}
+
+export interface StoryLevel {
+  levelNumber: number; // 1 to 5
+  phase: LevelPhase;   // 'discover' | 'explore' | 'solve' | 'teach' | 'master'
+  phaseLabel: string;  // "1. Discover", "2. Explore", "3. Solve", "4. Teach KIKI", "5. Master"
+  title: string;
+  sceneVisual: SceneVisualDetails;
+  sceneEmoji: string;
+  kikiExpression: 'happy' | 'thinking' | 'curious' | 'cheering' | 'explaining';
   kikiDialogue: string;
   characterSpeaker: string;
-  characterDialogue?: string;
-  options?: string[]; // for choice or prediction
+  characterDialogue: string;
+  shortNarration: string[]; // 1 to 3 short lines
+  keyDiscoveryHook: string;
+  interactionType: InteractionType;
+  prompt: string;
+  options?: string[]; // for choice, prediction, master
   expectedCoreConcept: string;
   scaffoldingHint: string;
 }
 
-export interface StoryChapter {
-  chapterNumber: number;
-  phase: 'spark' | 'puzzle' | 'triumph'; // 1: The Spark, 2: The Puzzle, 3: The Triumph
-  title: string;
-  sceneSetting: string;
-  sceneEmoji: string;
-  kikiExpression: 'happy' | 'thinking' | 'curious' | 'cheering' | 'explaining';
-  kikiDialogue: string;
-  narrativeParagraphs: string[];
-  keyConceptHook: string;
-  checkpoint: Checkpoint;
-}
-
 export interface ChildInteraction {
-  chapterNumber: number;
-  checkpointId: string;
+  levelNumber: number;
+  chapterNumber?: number; // compatibility alias
+  phase: LevelPhase;
+  checkpointId?: string; // compatibility alias
   question: string;
   childResponse: string;
   attemptNumber: number;
@@ -129,19 +135,38 @@ export interface LearningReport {
   masterySummary: string;
   conceptsDemonstrated: ReportDemonstratedConcept[];
   conceptsNeedingReinforcement: ReportReinforcementConcept[];
+  howKikiAdapted: string; // Explains teaching strategy & alternate analogies used
   cognitiveObservations: string[];
   suggestedNextActivities: NextLearningActivity[];
   totalStars: number;
+  totalLevels: number;
   createdAt: string;
 }
 
-export interface QuestSession {
+export interface AdventureSession {
   id: string;
   setup: ParentSetup;
-  currentChapterIndex: number;
-  chapters: StoryChapter[];
+  currentLevelIndex: number; // 0 to 4
+  levels: StoryLevel[];
+  currentChapterIndex?: number; // compatibility alias
+  chapters?: StoryLevel[];      // compatibility alias
   starsEarned: number;
   interactions: ChildInteraction[];
-  status: 'welcome' | 'story' | 'checkpoint' | 'scaffolding' | 'completed';
+  status: 'welcome' | 'playing' | 'story' | 'scaffolding' | 'completed';
   activeScaffolding?: AdaptiveScaffolding;
+}
+
+// Compatibility aliases
+export type QuestSession = AdventureSession;
+export type StoryChapter = StoryLevel;
+
+export interface Checkpoint {
+  id: string;
+  prompt: string;
+  type: InteractionType;
+  options?: string[];
+  expectedCoreConcept: string;
+  characterSpeaker?: string;
+  characterDialogue?: string;
+  scaffoldingHint?: string;
 }

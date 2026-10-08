@@ -1,8 +1,8 @@
-import { QuestSession, ParentSetup, StoryChapter } from '../types/quest';
+import { AdventureSession, ParentSetup, StoryLevel } from '../types/quest';
 
 const SESSION_STORAGE_KEY = 'kiki_active_session';
 
-export function saveActiveSession(session: QuestSession): void {
+export function saveActiveSession(session: AdventureSession): void {
   if (typeof window === 'undefined') return;
   try {
     sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
@@ -11,24 +11,26 @@ export function saveActiveSession(session: QuestSession): void {
   }
 }
 
-export function loadActiveSession(): QuestSession | null {
+export function loadActiveSession(): AdventureSession | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as QuestSession;
+    return JSON.parse(raw) as AdventureSession;
   } catch (err) {
     console.warn('Failed to parse active session:', err);
     return null;
   }
 }
 
-export function createInitialSession(setup: ParentSetup, chapters: StoryChapter[]): QuestSession {
+export function createInitialSession(setup: ParentSetup, levels: StoryLevel[]): AdventureSession {
   return {
     id: `kiki-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
     setup,
+    currentLevelIndex: 0,
+    levels,
     currentChapterIndex: 0,
-    chapters,
+    chapters: levels,
     starsEarned: 0,
     interactions: [],
     status: 'welcome' // starts with KIKI welcome screen
@@ -43,3 +45,4 @@ export function clearActiveSession(): void {
     console.warn('Failed to clear session:', err);
   }
 }
+

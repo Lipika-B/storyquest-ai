@@ -66,7 +66,7 @@ function synthesizeLocalReport(
   const conceptsDemonstrated = interactions
     .filter(i => i.demonstratedConcept)
     .map(i => ({
-      concept: `Chapter ${i.chapterNumber} Milestone (${setup.topic})`,
+      concept: `Level ${i.levelNumber ?? i.chapterNumber ?? 1} Milestone (${setup.topic})`,
       evidenceQuote: `“${i.childResponse.trim() || 'Applied reasoning correctly'}”`,
       observation: i.positiveEvidence[0] || `Demonstrated intuitive grasp of ${setup.learningGoal}.`
     }));
@@ -82,7 +82,7 @@ function synthesizeLocalReport(
   const conceptsNeedingReinforcement = interactions
     .filter(i => i.scaffoldingUsed || !i.demonstratedConcept)
     .map(i => ({
-      concept: `Initial Hesitation in Chapter ${i.chapterNumber}`,
+      concept: `Initial Hesitation in Level ${i.levelNumber ?? i.chapterNumber ?? 1}`,
       diagnosedHurdle: i.misconceptionIdentified || setup.struggle || 'Benefited from an alternate hands-on analogy before full confidence clicked.',
       recommendation: `Use tangible everyday objects connected to ${setup.interest || 'daily routines'} rather than abstract drill sheets.`
     }));
@@ -95,9 +95,14 @@ function synthesizeLocalReport(
     childAge: setup.childAge,
     ageBandLabel: band,
     estimatedMastery,
-    masterySummary: `${setup.childName || 'The learner'} completed KIKI’s ${setup.topic} adventure. Based on their responses across 3 interactive chapters, they demonstrated ${estimatedMastery.toLowerCase()} of the learning goal: "${setup.learningGoal}".`,
+    masterySummary: `${setup.childName || 'The learner'} completed KIKI’s ${setup.topic} adventure. Based on their responses across 5 adventure levels, they demonstrated ${estimatedMastery.toLowerCase()} of the learning goal: "${setup.learningGoal}".`,
     conceptsDemonstrated,
     conceptsNeedingReinforcement,
+    howKikiAdapted: scaffoldingCount > 0
+      ? `When ${setup.childName || 'the child'} hesitated on a story checkpoint, KIKI guided them with an encouraging, real-world analogy ("Try Again, Differently") rather than saying 'wrong', allowing them to grasp ${setup.learningGoal} with confidence.`
+      : `KIKI kept ${setup.childName || 'the child'} actively engaged through progressive story levels, reinforcing core concepts through interactive dialogue and positive celebration.`,
+    totalStars: starsEarned,
+    totalLevels: 5,
     cognitiveObservations: [
       `Engaged enthusiastically with the ${setup.storyWorld || 'adventure'} story world and companion dialogue.`,
       `Responded positively to KIKI’s 'Try Again, Differently' scaffolding without frustration.`,
@@ -117,7 +122,6 @@ function synthesizeLocalReport(
         whyItHelps: 'Builds lasting retention through child-led verbal recall.'
       }
     ],
-    totalStars: starsEarned,
     createdAt: new Date().toISOString()
   };
 }

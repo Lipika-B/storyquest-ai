@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ParentSetup, StoryChapter } from '@/lib/types/quest';
+import { ParentSetup, StoryLevel } from '@/lib/types/quest';
 import { callGeminiJSON } from '@/lib/ai/gemini';
 import { buildStoryPrompt } from '@/lib/ai/prompts';
 import { generateParametricStory } from '@/lib/ai/storyEngine';
 
 interface GenerateResponse {
-  chapters: StoryChapter[];
+  levels: StoryLevel[];
 }
 
 export async function POST(req: NextRequest) {
@@ -20,32 +20,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Attempt AI Generation via Gemini
+    // Attempt AI Generation via Gemini if key is present
     const prompt = buildStoryPrompt(setup);
     const aiResult = await callGeminiJSON<GenerateResponse>(prompt, {
       model: 'gemini-2.5-flash',
       temperature: 0.7,
     });
 
-    if (aiResult && Array.isArray(aiResult.chapters) && aiResult.chapters.length >= 3) {
-      return NextResponse.json({
-        success: true,
-        chapters: aiResult.chapters,
-        source: 'ai',
-      });
+    if (aiResult && Array.isArray(aiResult.levels) && aiResult.levels.length === 5) {
+      // Requirement 21: Topic Relevance Check
+      const isRelevant = verifyTopicRelevance(setup.topic, aiResult.levels);
+      if (isRelevant) {
+        return NextResponse.json({
+          success: true,
+          levels: aiResult.levels,
+          source: 'ai',
+        });
+      }
+      console.warn('[KIKI] AI generation failed topic relevance check. Using parametric story engine.');
     }
 
-    // Dynamic parametric fallback engine:
-    // Generates a tailored 3-chapter story weaving age, topic, goal, struggle, world, and companion
-    const parametricChapters = generateParametricStory(setup);
+    // Dynamic parametric engine guarantees 100% topic accuracy
+    const parametricLevels = generateParametricStory(setup);
     return NextResponse.json({
       success: true,
-      chapters: parametricChapters,
+      levels: parametricLevels,
       source: 'parametric_engine',
     });
   } catch (error) {
     console.error('Error in /api/story/generate:', error);
-    // In case of any exception, guarantee a custom story based on setup
     const fallbackSetup: ParentSetup = {
       childName: 'Explorer',
       childAge: 8,
@@ -54,11 +57,41 @@ export async function POST(req: NextRequest) {
       storyWorld: 'forest',
       companionType: 'animal'
     };
-    const rescueChapters = generateParametricStory(fallbackSetup);
+    const rescueLevels = generateParametricStory(fallbackSetup);
     return NextResponse.json({
       success: true,
-      chapters: rescueChapters,
+      levels: rescueLevels,
       source: 'recovery_engine',
     });
   }
+}
+
+/**
+ * Requirement 21: Verify that the generated levels are genuinely relevant to the requested topic.
+ */
+function verifyTopicRelevance(topic: string, levels: StoryLevel[]): boolean {
+  const fullText = JSON.stringify(levels).toLowerCase();
+  const topicWords = topic.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+
+  // If topic has significant words, at least one must be explicitly present in the levels
+  if (topicWords.length > 0) {
+    const hasTopicWord = topicWords.some(word => fullText.includes(word));
+    if (!hasTopicWord) return false;
+  }
+
+  // Cross-domain mismatch guards (e.g. Digestion vs Ocean/Water Cycle)
+  const topicLower = topic.toLowerCase();
+  if (topicLower.includes('digest') || topicLower.includes('stomach') || topicLower.includes('food')) {
+    if (fullText.includes('ocean waves') || fullText.includes('water cycle rain')) {
+      return false;
+    }
+  }
+
+  if (topicLower.includes('multipl') || topicLower.includes('table')) {
+    if (fullText.includes('photosynthesis leaves')) {
+      return false;
+    }
+  }
+
+  return true;
 }

@@ -58,45 +58,53 @@ export const ParentPortal: React.FC<ParentPortalProps> = ({
       </div>
 
       {/* Active Session Quick-Resume Pill */}
-      {activeSession && (
-        <div className="mb-8 p-4 rounded-2xl bg-amber-100/70 border border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{activeSession.chapters[activeSession.currentChapterIndex]?.sceneEmoji || '⭐'}</span>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black text-amber-950 uppercase tracking-wide">
-                  Active Adventure In Progress
-                </span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-950">
-                  Chapter {activeSession.currentChapterIndex + 1} of {activeSession.chapters.length}
-                </span>
+      {activeSession && (() => {
+        const levels = activeSession.levels || activeSession.chapters || [];
+        const currentIdx = activeSession.currentLevelIndex ?? activeSession.currentChapterIndex ?? 0;
+        const currentLvl = levels[currentIdx];
+        return (
+          <div className="mb-8 p-4 rounded-2xl bg-amber-100/70 border border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{currentLvl?.sceneEmoji || '⭐'}</span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-amber-950 uppercase tracking-wide">
+                    Active Adventure In Progress
+                  </span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-950">
+                    Level {currentIdx + 1} of {levels.length || 5}
+                  </span>
+                </div>
+                <p className="text-sm font-bold text-slate-900">
+                  {activeSession.setup.childName}’s Adventure: {activeSession.setup.topic}
+                </p>
               </div>
-              <p className="text-sm font-bold text-slate-900">
-                {activeSession.setup.childName}’s Adventure: {activeSession.setup.topic}
-              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={onJumpToQuest}
+                className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+              >
+                <span>Enter Adventure with KIKI</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              {activeSession.interactions && activeSession.interactions.length > 0 && (
+                <button
+                  type="button"
+                  onClick={onViewReport}
+                  className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-amber-300 text-amber-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  <span>View Report</span>
+                </button>
+              )}
             </div>
           </div>
+        );
+      })()}
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto">
-            <button
-              onClick={onJumpToQuest}
-              className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-amber-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
-            >
-              <span>Enter Adventure with KIKI</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-            {activeSession.interactions.length > 0 && (
-              <button
-                onClick={onViewReport}
-                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-amber-300 text-amber-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
-              >
-                <BarChart3 className="w-3.5 h-3.5" />
-                <span>View Report</span>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* 1. Curated KIKI Topic Worlds */}
       <TopicLibraryPicker

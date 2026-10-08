@@ -56,8 +56,8 @@ export default function Home() {
       setSession(saved);
       setSetup(saved.setup);
     } else {
-      const initialChapters = generateParametricStory(setup);
-      const initial = createInitialSession(setup, initialChapters);
+      const initialLevels = generateParametricStory(setup);
+      const initial = createInitialSession(setup, initialLevels);
       setSession(initial);
     }
   }, []);
@@ -91,8 +91,8 @@ export default function Home() {
     setSetup(updatedSetup);
 
     // Prepare fresh adventure for this topic
-    const freshChapters = generateParametricStory(updatedSetup);
-    const newSession = createInitialSession(updatedSetup, freshChapters);
+    const freshLevels = generateParametricStory(updatedSetup);
+    const newSession = createInitialSession(updatedSetup, freshLevels);
     setSession(newSession);
     setReport(null);
     setSuccessFeedback(null);
@@ -109,8 +109,9 @@ export default function Home() {
       });
 
       const data = await res.json();
-      if (data.chapters && data.chapters.length > 0) {
-        const newSession = createInitialSession(setup, data.chapters);
+      const generatedLevels = data.levels || data.chapters || [];
+      if (generatedLevels.length > 0) {
+        const newSession = createInitialSession(setup, generatedLevels);
         setSession(newSession);
         setReport(null);
         setCurrentPortal('child'); // Opens Child Adventure in welcome mode
@@ -118,8 +119,8 @@ export default function Home() {
     } catch (err) {
       console.error('Failed to generate story:', err);
       // Fallback to local parametric generation
-      const freshChapters = generateParametricStory(setup);
-      const newSession = createInitialSession(setup, freshChapters);
+      const freshLevels = generateParametricStory(setup);
+      const newSession = createInitialSession(setup, freshLevels);
       setSession(newSession);
       setCurrentPortal('child');
     } finally {
@@ -137,22 +138,55 @@ export default function Home() {
 
   const handleSubmitAnswer = async (response: string) => {
     if (!session) return;
-    const currentChapter = session.chapters[session.currentChapterIndex];
-    if (!currentChapter) return;
+    const levels = session.levels || session.chapters || [];
+    const currentIndex = session.currentLevelIndex ?? session.currentChapterIndex ?? 0;
+    const currentLevel = levels[currentIndex];
+    if (!currentLevel) return;
+
+    // Special Case: Level 1 "discover_tap" ("Let's find out! 🚀")
+    if (currentLevel.interactionType === 'discover_tap' || response === 'tap_discover') {
+      playSuccessChime();
+      playStarEarnedSound();
+
+      const interaction: ChildInteraction = {
+        levelNumber: currentLevel.levelNumber || currentIndex + 1,
+        phase: currentLevel.phase,
+        question: currentLevel.prompt || 'Discover Phase Initiation',
+        childResponse: 'Let’s find out! 🚀',
+        attemptNumber: 1,
+        demonstratedConcept: true,
+        positiveEvidence: ['Eagerly leaped into the discovery phase'],
+        misconceptionIdentified: null,
+        scaffoldingUsed: false,
+      };
+
+      const updatedInteractions = [...session.interactions, interaction];
+      const newStars = Math.min(levels.length, session.starsEarned + 1);
+
+      setSession({
+        ...session,
+        starsEarned: newStars,
+        interactions: updatedInteractions,
+        status: 'story',
+        activeScaffolding: undefined,
+      });
+
+      setSuccessFeedback(`Discovery unlocked! KIKI says: "${currentLevel.kikiDialogue || 'Off we go!'}" ⭐`);
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const checkpoint = currentChapter.checkpoint;
       const res = await fetch('/api/story/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          promptText: checkpoint.prompt,
+          promptText: currentLevel.prompt,
           childResponse: response,
-          expectedCoreConcept: checkpoint.expectedCoreConcept,
+          expectedCoreConcept: currentLevel.expectedCoreConcept,
           childAge: session.setup.childAge,
-          checkpointType: checkpoint.type,
-          options: checkpoint.options,
+          checkpointType: currentLevel.interactionType,
+          options: currentLevel.options,
         }),
       });
 
@@ -164,9 +198,9 @@ export default function Home() {
         playStarEarnedSound();
 
         const interaction: ChildInteraction = {
-          chapterNumber: currentChapter.chapterNumber,
-          checkpointId: checkpoint.id,
-          question: checkpoint.prompt,
+          levelNumber: currentLevel.levelNumber || currentIndex + 1,
+          phase: currentLevel.phase,
+          question: currentLevel.prompt,
           childResponse: response,
           attemptNumber: 1,
           demonstratedConcept: true,
@@ -176,7 +210,7 @@ export default function Home() {
         };
 
         const updatedInteractions = [...session.interactions, interaction];
-        const newStars = Math.min(session.chapters.length, session.starsEarned + 1);
+        const newStars = Math.min(levels.length, session.starsEarned + 1);
 
         setSession({
           ...session,
@@ -195,21 +229,21 @@ export default function Home() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            question: checkpoint.prompt,
+            question: currentLevel.prompt,
             childResponse: response,
-            expectedConcept: checkpoint.expectedCoreConcept,
+            expectedConcept: currentLevel.expectedCoreConcept,
             misconception: evalResult.misconceptionIdentified,
             setup: session.setup,
-            checkpointId: checkpoint.id,
+            checkpointId: `level-${currentLevel.levelNumber}`,
           }),
         });
 
         const scaffolding: AdaptiveScaffolding = await adaptRes.json();
 
         const interaction: ChildInteraction = {
-          chapterNumber: currentChapter.chapterNumber,
-          checkpointId: checkpoint.id,
-          question: checkpoint.prompt,
+          levelNumber: currentLevel.levelNumber || currentIndex + 1,
+          phase: currentLevel.phase,
+          question: currentLevel.prompt,
           childResponse: response,
           attemptNumber: 1,
           demonstratedConcept: false,
@@ -235,15 +269,17 @@ export default function Home() {
 
   const handleRetrySubmit = (retryAnswer: string) => {
     if (!session) return;
-    const currentChapter = session.chapters[session.currentChapterIndex];
-    if (!currentChapter) return;
+    const levels = session.levels || session.chapters || [];
+    const currentIndex = session.currentLevelIndex ?? session.currentChapterIndex ?? 0;
+    const currentLevel = levels[currentIndex];
+    if (!currentLevel) return;
 
     playSuccessChime();
     playStarEarnedSound();
 
     const retryInteraction: ChildInteraction = {
-      chapterNumber: currentChapter.chapterNumber,
-      checkpointId: `${currentChapter.checkpoint.id}-retry`,
+      levelNumber: currentLevel.levelNumber || currentIndex + 1,
+      phase: currentLevel.phase,
       question: session.activeScaffolding?.followUpPrompt || 'Scaffolded Clue',
       childResponse: retryAnswer,
       attemptNumber: 2,
@@ -253,7 +289,7 @@ export default function Home() {
       scaffoldingUsed: true,
     };
 
-    const newStars = Math.min(session.chapters.length, session.starsEarned + 1);
+    const newStars = Math.min(levels.length, session.starsEarned + 1);
 
     setSession({
       ...session,
@@ -272,10 +308,15 @@ export default function Home() {
     StorySpeaker.stop();
     setIsSpeaking(false);
 
-    if (session.currentChapterIndex < session.chapters.length - 1) {
+    const levels = session.levels || session.chapters || [];
+    const currentIndex = session.currentLevelIndex ?? session.currentChapterIndex ?? 0;
+
+    if (currentIndex < levels.length - 1) {
+      const nextIdx = currentIndex + 1;
       setSession({
         ...session,
-        currentChapterIndex: session.currentChapterIndex + 1,
+        currentLevelIndex: nextIdx,
+        currentChapterIndex: nextIdx,
         status: 'story',
         activeScaffolding: undefined,
       });
@@ -340,9 +381,11 @@ export default function Home() {
       setIsSpeaking(false);
     } else {
       if (!session) return;
-      const ch = session.chapters[session.currentChapterIndex];
-      if (!ch) return;
-      const text = `${ch.title}. ${ch.narrativeParagraphs.join(' ')}`;
+      const levels = session.levels || session.chapters || [];
+      const currentIndex = session.currentLevelIndex ?? session.currentChapterIndex ?? 0;
+      const lvl = levels[currentIndex];
+      if (!lvl) return;
+      const text = `${lvl.title}. ${lvl.shortNarration.join(' ')}`;
       setIsSpeaking(true);
       StorySpeaker.speak(text, () => setIsSpeaking(false));
     }
@@ -364,12 +407,13 @@ export default function Home() {
     };
     setSetup(newSetup);
     setSelectedTopicId(defaultTopic.id);
-    const freshChapters = generateParametricStory(newSetup);
-    setSession(createInitialSession(newSetup, freshChapters));
+    const freshLevels = generateParametricStory(newSetup);
+    setSession(createInitialSession(newSetup, freshLevels));
     setReport(null);
     setSuccessFeedback(null);
     setCurrentPortal('parent');
   };
+
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
